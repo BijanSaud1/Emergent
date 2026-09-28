@@ -35,7 +35,8 @@ export default function HomeScreen() {
   const [showFreeze, setShowFreeze] = useState(false);
   const [savedFact, setSavedFact] = useState(false);
 
-  const trending = courses.slice(0, 4);
+  const trending = courses.slice(0, 5);
+  const trendingStats = ["12.4k", "8.7k", "6.3k", "5.1k", "4.2k"];
 
   return (
     <View style={styles.container} testID="home-screen">
@@ -258,42 +259,95 @@ export default function HomeScreen() {
         {/* Trending Concepts */}
         <View style={styles.section}>
           <View style={styles.sectionRow}>
-            <Text style={styles.sectionTitle}>Trending Concepts</Text>
+            <View style={styles.trendingHead}>
+              <Text style={styles.trendingFlame}>🔥</Text>
+              <Text style={styles.sectionTitle}>Trending this week</Text>
+            </View>
             <Pressable>
               <Text style={styles.sectionAction}>See all</Text>
             </Pressable>
           </View>
-          <View style={styles.grid}>
-            {trending.map((c) => (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.trendRow}
+            snapToInterval={244}
+            decelerationRate="fast"
+          >
+            {trending.map((c, idx) => (
               <Pressable
                 key={c.id}
-                style={styles.skillCard}
-                testID={`skill-${c.id}`}
+                style={styles.trendCard}
+                testID={`trend-${c.id}`}
                 onPress={() => router.push(`/concept/${c.id}`)}
               >
-                <View
-                  style={[
-                    styles.skillIconBox,
-                    { backgroundColor: c.color + "22" },
-                  ]}
-                >
-                  <Text style={styles.skillEmoji}>{c.emoji}</Text>
-                </View>
-                <Text style={styles.skillTitle} numberOfLines={1}>
-                  {c.title}
-                </Text>
-                <Text style={styles.skillMeta}>
-                  {c.category} · {c.duration}
-                </Text>
-                <View style={styles.skillFooter}>
-                  <View style={styles.xpPillSmall}>
-                    <Feather name="zap" size={10} color={colors.onBrandSecondary} />
-                    <Text style={styles.xpSmallText}>{c.xp} XP</Text>
+                <View style={styles.trendCover}>
+                  <Image
+                    source={{ uri: c.image }}
+                    style={StyleSheet.absoluteFill}
+                    contentFit="cover"
+                    transition={200}
+                  />
+                  <LinearGradient
+                    colors={[
+                      "rgba(19,22,20,0.05)",
+                      "rgba(19,22,20,0.35)",
+                      "rgba(19,22,20,0.92)",
+                    ]}
+                    locations={[0, 0.5, 1]}
+                    style={StyleSheet.absoluteFill}
+                  />
+
+                  {/* rank badge */}
+                  <View style={styles.rankBadge}>
+                    <Text style={styles.rankNum}>#{idx + 1}</Text>
+                  </View>
+
+                  {/* trending stat */}
+                  <View style={styles.learnersPill}>
+                    <Feather name="trending-up" size={11} color={colors.onSurface} />
+                    <Text style={styles.learnersText}>{trendingStats[idx]}</Text>
+                  </View>
+
+                  {/* emoji medallion */}
+                  <View
+                    style={[styles.trendEmojiBox, { backgroundColor: c.color }]}
+                  >
+                    <Text style={styles.trendEmoji}>{c.emoji}</Text>
+                  </View>
+
+                  {/* content bottom */}
+                  <View style={styles.trendContent}>
+                    <View style={styles.trendSubjectRow}>
+                      <View style={styles.trendSubjectPill}>
+                        <Text style={styles.trendSubjectText}>{c.category}</Text>
+                      </View>
+                      <View style={styles.trendLevelPill}>
+                        <Text style={styles.trendLevelText}>{c.level}</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.trendTitle} numberOfLines={2}>
+                      {c.title}
+                    </Text>
+                    <View style={styles.trendMetaRow}>
+                      <Feather name="clock" size={11} color="rgba(255,255,255,0.85)" />
+                      <Text style={styles.trendMeta}>{c.duration}</Text>
+                      <Text style={styles.trendMetaDot}>·</Text>
+                      <Feather name="zap" size={11} color={colors.brandSecondary} />
+                      <Text
+                        style={[
+                          styles.trendMeta,
+                          { color: colors.brandSecondary, fontWeight: "700" },
+                        ]}
+                      >
+                        {c.xp} XP
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </Pressable>
             ))}
-          </View>
+          </ScrollView>
         </View>
       </ScrollView>
     </View>
@@ -579,4 +633,152 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.6)",
   },
   factSaveText: { fontSize: 12, fontWeight: "700", color: colors.onSurface },
+
+  // Trending — Netflix-style carousel
+  trendingHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: spacing.md,
+  },
+  trendingFlame: { fontSize: 18, marginBottom: spacing.md },
+  trendRow: {
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  trendCard: {
+    width: 232,
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
+      },
+      android: { elevation: 5 },
+    }),
+  },
+  trendCover: {
+    width: 232,
+    height: 300,
+    justifyContent: "flex-end",
+    backgroundColor: colors.surfaceTertiary,
+  },
+  rankBadge: {
+    position: "absolute",
+    top: spacing.md,
+    left: spacing.md,
+    backgroundColor: "rgba(19,22,20,0.6)",
+    paddingHorizontal: 10,
+    height: 26,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
+  },
+  rankNum: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    letterSpacing: 0.3,
+  },
+  learnersPill: {
+    position: "absolute",
+    top: spacing.md,
+    right: spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    paddingHorizontal: 10,
+    height: 26,
+    borderRadius: radius.pill,
+  },
+  learnersText: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: colors.onSurface,
+  },
+  trendEmojiBox: {
+    position: "absolute",
+    top: 56,
+    right: spacing.md,
+    width: 56,
+    height: 56,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.9)",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  trendEmoji: { fontSize: 28 },
+  trendContent: {
+    padding: spacing.md,
+    gap: 6,
+  },
+  trendSubjectRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    marginBottom: 2,
+  },
+  trendSubjectPill: {
+    backgroundColor: "rgba(255,255,255,0.22)",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.pill,
+  },
+  trendSubjectText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    letterSpacing: 0.4,
+  },
+  trendLevelPill: {
+    backgroundColor: colors.brandSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.pill,
+  },
+  trendLevelText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: colors.onBrandSecondary,
+    letterSpacing: 0.4,
+  },
+  trendTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    letterSpacing: -0.3,
+    lineHeight: 22,
+  },
+  trendMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 4,
+  },
+  trendMeta: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.85)",
+  },
+  trendMetaDot: {
+    color: "rgba(255,255,255,0.6)",
+    fontSize: 11,
+    marginHorizontal: 2,
+  },
 });
