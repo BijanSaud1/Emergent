@@ -44,6 +44,38 @@ export type Badge = {
   earned: boolean;
 };
 
+export type Lesson = {
+  id: string;
+  title: string;
+  emoji: string;
+  body: string;
+  highlight?: string;
+};
+
+export type QuizQuestion = {
+  id: string;
+  prompt: string;
+  options: { id: string; text: string; correct: boolean }[];
+  explanation: string;
+};
+
+export type ConceptContent = {
+  overview: string;
+  keyIdeas: string[];
+  lessons: Lesson[];
+  quiz: QuizQuestion[];
+};
+
+export type FactOfTheDay = {
+  id: string;
+  topic: string;
+  title: string;
+  body: string;
+  emoji: string;
+  color: string;
+};
+
+
 export const user = {
   name: "Alex Rivera",
   handle: "@alex.thinks",
@@ -370,3 +402,149 @@ export const learningPaths = [
     emoji: "🪐",
   },
 ];
+
+// Rich content per concept. If a concept has no entry here it uses a generic
+// fallback in the screen.
+export const conceptContent: Record<string, ConceptContent> = {
+  "1": {
+    overview:
+      "Solomon's Paradox describes a curious tendency: we reason far more wisely about other people's problems than about our own. Named after the biblical king Solomon — legendary for advising others but chaotic in his own life — it reveals how our closeness to a problem clouds our judgment.",
+    keyIdeas: [
+      "We give better advice to friends than to ourselves.",
+      "Psychological distance sharpens our reasoning.",
+      "Small perspective tricks can restore wise thinking.",
+    ],
+    lessons: [
+      {
+        id: "l1",
+        title: "Meet the paradox",
+        emoji: "👑",
+        body: "King Solomon was famous for wise counsel, yet his personal life spiraled into excess and conflict. Modern research shows this isn't just an ancient story — most people reason more wisely about others than about themselves.",
+        highlight: "Wisdom for others, blind spots for ourselves.",
+      },
+      {
+        id: "l2",
+        title: "What the research shows",
+        emoji: "🔬",
+        body: "In a landmark 2014 study, participants imagined a betrayal happening to a friend or to themselves. When it was a friend's story, they thought about compromise, multiple perspectives, and long-term outcomes. When it was their own, they narrowed in on their emotions and defended themselves.",
+      },
+      {
+        id: "l3",
+        title: "Why does distance help?",
+        emoji: "🔭",
+        body: "Psychological distance — imagining an event as far away in time, space or from another person — quiets the emotional alarm system. It lets the slower, reflective part of your mind weigh trade-offs instead of protecting the ego.",
+        highlight: "Distance turns down the volume on emotion.",
+      },
+      {
+        id: "l4",
+        title: "The self-distancing trick",
+        emoji: "🪞",
+        body: "Try describing your problem in the third person: 'Why is Alex struggling with this decision?' Ethan Kross's research shows this simple linguistic shift measurably improves reasoning, calms anxiety, and even reduces blood pressure under stress.",
+      },
+      {
+        id: "l5",
+        title: "Advice from a future self",
+        emoji: "⏳",
+        body: "Another proven move: imagine yourself ten years from now looking back at today's problem. Time distance shrinks the drama of the current moment and reveals what will actually matter.",
+      },
+      {
+        id: "l6",
+        title: "Where to use it",
+        emoji: "🧭",
+        body: "Big career choices, arguments with loved ones, financial decisions — anywhere emotion is loud, Solomon's Paradox tools help. Journaling in the third person or asking 'What would I tell a friend?' are the fastest routes to wiser choices.",
+      },
+      {
+        id: "l7",
+        title: "You've got it",
+        emoji: "🎉",
+        body: "When you notice you're stuck inside your own head, step outside of it. That's the essence of Solomon's Paradox — and now it's a tool in your kit.",
+        highlight: "Step outside your story to see it clearly.",
+      },
+    ],
+    quiz: [
+      {
+        id: "q1",
+        prompt:
+          "Solomon's Paradox says people reason better about ______ than about ______.",
+        options: [
+          { id: "a", text: "the past · the future", correct: false },
+          { id: "b", text: "other people's problems · their own", correct: true },
+          { id: "c", text: "money · relationships", correct: false },
+        ],
+        explanation:
+          "The paradox is exactly this asymmetry: wise counsel for others, muddled reasoning for ourselves.",
+      },
+      {
+        id: "q2",
+        prompt: "Which technique is proven to reduce Solomon's Paradox?",
+        options: [
+          { id: "a", text: "Talking louder about the problem", correct: false },
+          {
+            id: "b",
+            text: "Describing your problem in the third person",
+            correct: true,
+          },
+          { id: "c", text: "Ignoring your emotions completely", correct: false },
+        ],
+        explanation:
+          "Self-distancing through third-person language (Ethan Kross's research) restores reflective reasoning.",
+      },
+      {
+        id: "q3",
+        prompt: "Why does psychological distance help wise reasoning?",
+        options: [
+          {
+            id: "a",
+            text: "It quiets the emotional alarm system so the reflective mind can weigh trade-offs.",
+            correct: true,
+          },
+          { id: "b", text: "It hides the problem so you forget it.", correct: false },
+          { id: "c", text: "It makes decisions purely rational.", correct: false },
+        ],
+        explanation:
+          "Distance lowers emotional intensity so the slower, wiser part of your mind can engage.",
+      },
+      {
+        id: "q4",
+        prompt: "You're stuck on a career decision. Which move fits the paradox's lesson best?",
+        options: [
+          {
+            id: "a",
+            text: "Ask: 'What would I tell a close friend to do?'",
+            correct: true,
+          },
+          { id: "b", text: "Trust your first gut feeling only.", correct: false },
+          { id: "c", text: "Decide immediately before doubt creeps in.", correct: false },
+        ],
+        explanation:
+          "Framing yourself as a friend imports the wiser reasoning we usually reserve for others.",
+      },
+      {
+        id: "q5",
+        prompt: "Solomon's Paradox is named after King Solomon because…",
+        options: [
+          {
+            id: "a",
+            text: "He gave wise counsel to others but his own life was chaotic.",
+            correct: true,
+          },
+          { id: "b", text: "He invented the concept of self-reflection.", correct: false },
+          { id: "c", text: "He was a modern psychologist.", correct: false },
+        ],
+        explanation:
+          "The historical Solomon perfectly embodied the split between advising others well and struggling with his own choices.",
+      },
+    ],
+  },
+};
+
+export const factOfTheDay: FactOfTheDay = {
+  id: "fod-1",
+  topic: "Astronomy",
+  title: "A day on Venus is longer than its year",
+  body:
+    "Venus rotates so slowly that a single Venusian day (243 Earth days) takes longer than a full trip around the Sun (225 Earth days).",
+  emoji: "🪐",
+  color: "#FFC800",
+};
+

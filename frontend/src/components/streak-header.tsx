@@ -6,19 +6,20 @@ import { colors, radius, spacing } from "@/src/theme";
 type Props = {
   streak: number;
   onPressAvatar?: () => void;
+  onPressStreak?: () => void;
   avatar: string;
   title: string;
   subtitle?: string;
 };
 
-export function StreakHeader({ streak, title, subtitle }: Props) {
+export function StreakHeader({ streak, title, subtitle, onPressStreak }: Props) {
   return (
     <View style={styles.row} testID="streak-header">
       <View style={{ flex: 1 }}>
         <Text style={styles.subtitle}>{subtitle}</Text>
         <Text style={styles.title}>{title}</Text>
       </View>
-      <Pressable style={styles.streakPill} testID="streak-pill">
+      <Pressable style={styles.streakPill} testID="streak-pill" onPress={onPressStreak}>
         <Feather name="zap" size={16} color={colors.onBrandSecondary} />
         <Text style={styles.streakText}>{streak}</Text>
       </Pressable>

@@ -1,26 +1,33 @@
-# CodeQuest — Concept-Based Learning App (Frontend Design)
+# CodeQuest — Concept-Based Learning App (Frontend)
 
 ## Overview
-CodeQuest is a mobile-first React Native / Expo learning app for **concept-based learning** — bite-sized ideas across Biology, Physics, Psychology, Philosophy and History (e.g. Solomon's Paradox, Photosynthesis, Evolution, Ship of Theseus, Quantum Entanglement). Frontend only, mock data.
+Mobile-first React Native / Expo learning app for **concepts** (Solomon's Paradox, Photosynthesis, Evolution, Ship of Theseus, Quantum Entanglement, Trolley Problem, Black Holes, Cognitive Dissonance, Roman Republic…). Frontend only, mock data.
 
-## Personality & Design System
-- Personality: **Tactile / Playful LIGHT** — chunky cards, generous spacing, rounded corners, subtle shadows, playful emoji per concept.
-- Palette: Mint Green `#04B077` (primary), Sunny Yellow `#FFC800` (streaks/rewards), Coral Pink `#FF5277` (accents/badges).
-- Icons: `@react-native-vector-icons/feather`. Tokens in `frontend/src/theme.ts`.
+## What's inside
 
-## Navigation (4 tabs, glassmorphic blur bar)
-1. **Home** — greeting, streak, Continue Learning hero (Solomon's Paradox), daily goals, learning paths (Mind & Behavior, How Life Works, The Universe), trending concepts grid with emoji tiles.
-2. **Learn** — search, sticky category chips (Biology, Physics, Psychology, Philosophy, History…), scrollable concept cards with image + subject pill + big emoji + progress.
-3. **Challenges** — gradient Daily Challenge hero (Ship of Theseus), difficulty segmented control, practice list, leaderboard with medals.
-4. **Profile** — avatar with level ring, XP progress, 2×2 stats, badges grid, settings.
+### 4 Tab screens (glassmorphic tab bar)
+1. **Home** — greeting + streak, Continue Learning hero, **Fact of the Day** card (savable), Daily Goals, Learning Paths carousel, Trending Concepts grid.
+2. **Learn** — search + sticky category chips + concept cards with image + subject pill + big emoji + progress; tap goes to concept detail.
+3. **Challenges** — gradient Daily Challenge hero, difficulty segmented control, practice list, leaderboard with medals.
+4. **Profile** — avatar + level ring, XP bar, 2×2 stats, badges grid, settings.
 
-iOS 26+ uses Liquid Glass native tabs; older iOS / Android / Web fall back to classic `<Tabs>`.
+### Concept flows (route: `/concept/[id]`)
+- **Concept detail** (`/concept/[id]`) — hero with image + emoji, meta chips, progress if any, Overview, Key Ideas, "What's inside" cards, sticky bottom bar with **Prove it** + **Start / Continue learning**.
+- **Learn flow** (`/concept/[id]/learn`) — full paginated lesson reader with progress dots, per-lesson emoji, body copy, optional highlight callout, Next/Prev nav, and a celebratory "Got it!" completion screen that offers going straight to Prove.
+- **Prove flow** (`/concept/[id]/prove`) — quiz with multiple-choice, instant feedback (correct/incorrect + explanation), running score, final results screen with %, XP earned, and Try Again.
+
+Rich real content for **Solomon's Paradox** (7 lessons + 5 quiz questions). Any other concept falls back to a generic mini flow.
+
+### Extras
+- **Fact of the Day** card on Home with Save-to-Bookmarks toggle.
+- **Streak Freeze** upsell modal triggered by tapping the streak pill (Monthly / Annual plans, perks list, free-trial CTA).
 
 ## Files
 - `app/(tabs)/_layout.tsx`, `app/(tabs)/index.tsx`, `learn.tsx`, `challenges.tsx`, `profile.tsx`
-- `src/data/mock.ts` — concepts, challenges, leaderboard, badges, user
-- `src/components/progress-bar.tsx`, `streak-header.tsx`
-- `src/navigation.ts`, `src/theme.ts`
+- `app/concept/[id]/index.tsx`, `learn.tsx`, `prove.tsx`
+- `src/data/mock.ts` — concepts, quiz, lessons, badges, leaderboard, fact of the day
+- `src/components/progress-bar.tsx`, `streak-header.tsx`, `streak-freeze-modal.tsx`
+- `src/theme.ts`, `src/navigation.ts`
 
-## Not in scope (yet)
-- Concept detail / lesson reader screens, quiz flow, backend, auth, real progress persistence.
+## Not in scope
+- Real backend, auth, real progress persistence.

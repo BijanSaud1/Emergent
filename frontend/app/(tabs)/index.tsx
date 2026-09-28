@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,24 +10,30 @@ import {
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@react-native-vector-icons/feather";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
 import { usesNativeTabs } from "@/src/navigation";
 import { StreakHeader } from "@/src/components/streak-header";
 import { ProgressBar } from "@/src/components/progress-bar";
+import { StreakFreezeModal } from "@/src/components/streak-freeze-modal";
 import {
   user,
   continueLearning,
   dailyGoals,
   courses,
   learningPaths,
+  factOfTheDay,
 } from "@/src/data/mock";
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
   const scrollPadBottom = spacing.xxl;
+  const [showFreeze, setShowFreeze] = useState(false);
+  const [savedFact, setSavedFact] = useState(false);
 
   const trending = courses.slice(0, 4);
 
@@ -39,8 +45,15 @@ export default function HomeScreen() {
           title={`Hi, ${user.name.split(" ")[0]} 👋`}
           subtitle="What will you learn today?"
           avatar={user.avatar}
+          onPressStreak={() => setShowFreeze(true)}
         />
       </View>
+
+      <StreakFreezeModal
+        visible={showFreeze}
+        streak={user.streak}
+        onClose={() => setShowFreeze(false)}
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -51,7 +64,11 @@ export default function HomeScreen() {
         {/* Continue Learning hero */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Continue Learning</Text>
-          <Pressable style={styles.heroCard} testID="continue-learning-card">
+          <Pressable
+            style={styles.heroCard}
+            testID="continue-learning-card"
+            onPress={() => router.push(`/concept/${continueLearning.id === "c-1" ? "1" : "1"}/learn`)}
+          >
             <Image
               source={{ uri: continueLearning.image }}
               style={StyleSheet.absoluteFill}
@@ -88,6 +105,65 @@ export default function HomeScreen() {
               </View>
             </View>
           </Pressable>
+        </View>
+
+        {/* Fact of the Day */}
+        <View style={styles.section}>
+          <View style={styles.sectionRow}>
+            <Text style={styles.sectionTitle}>Fact of the Day</Text>
+            <View style={styles.factDate}>
+              <Feather name="calendar" size={11} color={colors.onSurface} />
+              <Text style={styles.factDateText}>Today</Text>
+            </View>
+          </View>
+          <View
+            style={[
+              styles.factCard,
+              {
+                backgroundColor: factOfTheDay.color + "18",
+                borderColor: factOfTheDay.color + "55",
+              },
+            ]}
+            testID="fact-of-the-day"
+          >
+            <View style={styles.factRow}>
+              <View
+                style={[
+                  styles.factEmojiBox,
+                  { backgroundColor: factOfTheDay.color },
+                ]}
+              >
+                <Text style={styles.factEmoji}>{factOfTheDay.emoji}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.factTopic}>{factOfTheDay.topic}</Text>
+                <Text style={styles.factTitle}>{factOfTheDay.title}</Text>
+              </View>
+            </View>
+            <Text style={styles.factBody}>{factOfTheDay.body}</Text>
+            <Pressable
+              onPress={() => setSavedFact((s) => !s)}
+              style={[
+                styles.factSaveBtn,
+                savedFact && { backgroundColor: colors.brandPrimary },
+              ]}
+              testID="save-fact-btn"
+            >
+              <Feather
+                name={savedFact ? "check" : "bookmark"}
+                size={14}
+                color={savedFact ? colors.onBrandPrimary : colors.onSurface}
+              />
+              <Text
+                style={[
+                  styles.factSaveText,
+                  savedFact && { color: colors.onBrandPrimary },
+                ]}
+              >
+                {savedFact ? "Saved to bookmarks" : "Save to bookmarks"}
+              </Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Daily Goals */}
@@ -193,6 +269,7 @@ export default function HomeScreen() {
                 key={c.id}
                 style={styles.skillCard}
                 testID={`skill-${c.id}`}
+                onPress={() => router.push(`/concept/${c.id}`)}
               >
                 <View
                   style={[
@@ -435,4 +512,71 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.onBrandSecondary,
   },
+
+  // Fact of the day
+  factDate: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: colors.surfaceTertiary,
+    paddingHorizontal: spacing.md,
+    height: 26,
+    borderRadius: radius.pill,
+    marginBottom: spacing.md,
+  },
+  factDateText: { fontSize: 11, fontWeight: "700", color: colors.onSurface },
+  factCard: {
+    marginHorizontal: spacing.lg,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1.5,
+    gap: spacing.md,
+  },
+  factRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  factEmojiBox: {
+    width: 52,
+    height: 52,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  factEmoji: { fontSize: 28 },
+  factTopic: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.onSurface,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    opacity: 0.7,
+    marginBottom: 2,
+  },
+  factTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: colors.onSurface,
+    letterSpacing: -0.3,
+    lineHeight: 22,
+  },
+  factBody: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.onSurface,
+    fontWeight: "500",
+    opacity: 0.85,
+  },
+  factSaveBtn: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: spacing.md,
+    height: 34,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(255,255,255,0.6)",
+  },
+  factSaveText: { fontSize: 12, fontWeight: "700", color: colors.onSurface },
 });

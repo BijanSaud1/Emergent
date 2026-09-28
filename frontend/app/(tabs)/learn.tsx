@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import Feather from "@react-native-vector-icons/feather";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
@@ -117,8 +118,13 @@ export default function LearnScreen() {
 }
 
 function CourseCard({ course }: { course: Course }) {
+  const router = useRouter();
   return (
-    <Pressable style={styles.card} testID={`course-${course.id}`}>
+    <Pressable
+      style={styles.card}
+      testID={`course-${course.id}`}
+      onPress={() => router.push(`/concept/${course.id}`)}
+    >
       <View style={[styles.cardCover, { backgroundColor: course.color }]}>
         <Image
           source={{ uri: course.image }}
