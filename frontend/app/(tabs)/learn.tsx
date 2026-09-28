@@ -41,7 +41,7 @@ export default function LearnScreen() {
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Learn</Text>
-            <Text style={styles.subtitle}>Pick a skill to master</Text>
+            <Text style={styles.subtitle}>Explore a new concept</Text>
           </View>
           <Pressable style={styles.iconBtn} testID="filter-btn">
             <Feather name="sliders" size={18} color={colors.onSurface} />
@@ -52,7 +52,7 @@ export default function LearnScreen() {
           <Feather name="search" size={16} color={colors.muted} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search courses, languages…"
+            placeholder="Search concepts, subjects…"
             placeholderTextColor={colors.muted}
             value={query}
             onChangeText={setQuery}
@@ -108,7 +108,7 @@ export default function LearnScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Feather name="inbox" size={40} color={colors.muted} />
-            <Text style={styles.emptyText}>No courses found</Text>
+            <Text style={styles.emptyText}>No concepts found</Text>
           </View>
         }
       />
@@ -119,16 +119,23 @@ export default function LearnScreen() {
 function CourseCard({ course }: { course: Course }) {
   return (
     <Pressable style={styles.card} testID={`course-${course.id}`}>
-      <View style={[styles.cardCover, { backgroundColor: course.color + "1A" }]}>
+      <View style={[styles.cardCover, { backgroundColor: course.color }]}>
         <Image
           source={{ uri: course.image }}
           style={styles.cardImage}
           contentFit="cover"
           transition={150}
         />
-        <View style={[styles.levelPill, { backgroundColor: course.color }]}>
-          <Text style={styles.levelText}>{course.level}</Text>
+        <View style={styles.cardScrim} />
+        <View style={styles.cardCoverTop}>
+          <View style={[styles.levelPill, { backgroundColor: "rgba(255,255,255,0.95)" }]}>
+            <Text style={[styles.levelText, { color: course.color }]}>{course.level}</Text>
+          </View>
+          <View style={styles.subjectPill}>
+            <Text style={styles.subjectText}>{course.category}</Text>
+          </View>
         </View>
+        <Text style={styles.cardEmoji}>{course.emoji}</Text>
       </View>
       <View style={styles.cardBody}>
         <Text style={styles.cardTitle} numberOfLines={1}>
@@ -140,7 +147,7 @@ function CourseCard({ course }: { course: Course }) {
 
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
-            <Feather name="book" size={12} color={colors.muted} />
+            <Feather name="layers" size={12} color={colors.muted} />
             <Text style={styles.metaText}>{course.lessons} lessons</Text>
           </View>
           <View style={styles.metaItem}>
@@ -166,7 +173,7 @@ function CourseCard({ course }: { course: Course }) {
           </View>
         ) : (
           <View style={styles.startBtn}>
-            <Text style={styles.startBtnText}>Start course</Text>
+            <Text style={styles.startBtnText}>Start concept</Text>
             <Feather name="arrow-right" size={14} color={colors.onBrandPrimary} />
           </View>
         )}
@@ -269,13 +276,45 @@ const styles = StyleSheet.create({
     }),
   },
   cardCover: {
-    height: 130,
+    height: 140,
     justifyContent: "flex-end",
     padding: spacing.md,
+    position: "relative",
   },
   cardImage: {
     ...StyleSheet.absoluteFillObject,
-    opacity: 0.9,
+    opacity: 0.55,
+  },
+  cardScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(19,22,20,0.15)",
+  },
+  cardCoverTop: {
+    position: "absolute",
+    top: spacing.md,
+    left: spacing.md,
+    right: spacing.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cardEmoji: {
+    position: "absolute",
+    right: spacing.md,
+    bottom: spacing.sm,
+    fontSize: 56,
+  },
+  subjectPill: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+    backgroundColor: "rgba(19,22,20,0.35)",
+  },
+  subjectText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
   levelPill: {
     alignSelf: "flex-start",

@@ -37,7 +37,7 @@ export default function HomeScreen() {
         <StreakHeader
           streak={user.streak}
           title={`Hi, ${user.name.split(" ")[0]} 👋`}
-          subtitle="Ready to level up today?"
+          subtitle="What will you learn today?"
           avatar={user.avatar}
         />
       </View>
@@ -179,10 +179,10 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Trending Skills */}
+        {/* Trending Concepts */}
         <View style={styles.section}>
           <View style={styles.sectionRow}>
-            <Text style={styles.sectionTitle}>Trending Skills</Text>
+            <Text style={styles.sectionTitle}>Trending Concepts</Text>
             <Pressable>
               <Text style={styles.sectionAction}>See all</Text>
             </Pressable>
@@ -200,17 +200,13 @@ export default function HomeScreen() {
                     { backgroundColor: c.color + "22" },
                   ]}
                 >
-                  <Image
-                    source={{ uri: c.image }}
-                    style={styles.skillIcon}
-                    contentFit="cover"
-                  />
+                  <Text style={styles.skillEmoji}>{c.emoji}</Text>
                 </View>
                 <Text style={styles.skillTitle} numberOfLines={1}>
                   {c.title}
                 </Text>
                 <Text style={styles.skillMeta}>
-                  {c.lessons} lessons · {c.level}
+                  {c.category} · {c.duration}
                 </Text>
                 <View style={styles.skillFooter}>
                   <View style={styles.xpPillSmall}>
@@ -411,7 +407,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     overflow: "hidden",
   },
-  skillIcon: { width: 44, height: 44 },
+  skillEmoji: { fontSize: 24 },
   skillTitle: {
     fontSize: 14,
     fontWeight: "700",

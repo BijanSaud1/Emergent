@@ -34,7 +34,7 @@ export default function ChallengesScreen() {
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>Challenges</Text>
-            <Text style={styles.subtitle}>Prove your skills, earn XP</Text>
+            <Text style={styles.subtitle}>Test your understanding</Text>
           </View>
           <View style={styles.xpBadge}>
             <Feather name="zap" size={14} color={colors.onBrandSecondary} />
