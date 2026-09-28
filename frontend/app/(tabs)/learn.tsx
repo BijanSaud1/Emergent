@@ -10,6 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@react-native-vector-icons/feather";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,15 +20,30 @@ import { usesNativeTabs } from "@/src/navigation";
 import { ProgressBar } from "@/src/components/progress-bar";
 import { categories, courses, Course } from "@/src/data/mock";
 
+const chipEmojis: Record<string, string> = {
+  All: "✨",
+  Trending: "🔥",
+  Biology: "🌿",
+  Physics: "⚛️",
+  Psychology: "🧠",
+  Philosophy: "🚋",
+  History: "🏛️",
+};
+
 export default function LearnScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
   const scrollPadBottom = spacing.xxl;
   const [active, setActive] = useState("All");
   const [query, setQuery] = useState("");
 
+  const inProgress = courses.filter((c) => c.progress > 0);
   const filtered = courses.filter((c) => {
-    const matchCat = active === "All" || c.category === active || (active === "Popular" && c.progress > 0);
+    const matchCat =
+      active === "All" ||
+      c.category === active ||
+      (active === "Trending" && c.progress > 0);
     const matchQuery =
       query.trim() === "" ||
       c.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -35,14 +51,23 @@ export default function LearnScreen() {
     return matchCat && matchQuery;
   });
 
+  const totalHours = courses.reduce((acc) => acc + 1, 0);
+
   return (
     <View style={styles.container} testID="learn-screen">
-      {/* Sticky header */}
-      <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
+      {/* Sticky header with subtle gradient */}
+      <LinearGradient
+        colors={[colors.brandPrimary + "10", colors.surface]}
+        style={[styles.header, { paddingTop: insets.top + spacing.md }]}
+      >
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Learn</Text>
-            <Text style={styles.subtitle}>Explore a new concept</Text>
+            <View style={styles.headerBadge}>
+              <Text style={styles.headerBadgeText}>
+                {courses.length}+ CONCEPTS
+              </Text>
+            </View>
+            <Text style={styles.title}>Learn something{"\n"}new today</Text>
           </View>
           <Pressable style={styles.iconBtn} testID="filter-btn">
             <Feather name="sliders" size={18} color={colors.onSurface} />
@@ -59,6 +84,11 @@ export default function LearnScreen() {
             onChangeText={setQuery}
             testID="search-input"
           />
+          {query.length > 0 && (
+            <Pressable onPress={() => setQuery("")} testID="clear-btn">
+              <Feather name="x" size={16} color={colors.muted} />
+            </Pressable>
+          )}
         </View>
 
         <ScrollView
@@ -79,6 +109,7 @@ export default function LearnScreen() {
                 ]}
                 testID={`chip-${c}`}
               >
+                <Text style={styles.chipEmoji}>{chipEmojis[c] ?? "📚"}</Text>
                 <Text
                   style={[
                     styles.chipText,
@@ -93,7 +124,7 @@ export default function LearnScreen() {
             );
           })}
         </ScrollView>
-      </View>
+      </LinearGradient>
 
       <FlatList
         data={filtered}
@@ -105,11 +136,79 @@ export default function LearnScreen() {
           gap: spacing.md,
         }}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          inProgress.length > 0 ? (
+            <View style={styles.inProgressBlock}>
+              <View style={styles.sectionHead}>
+                <Text style={styles.sectionTitle}>Continue learning</Text>
+                <View style={styles.sectionPill}>
+                  <Text style={styles.sectionPillText}>
+                    {inProgress.length} active
+                  </Text>
+                </View>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: spacing.md }}
+              >
+                {inProgress.map((c) => (
+                  <Pressable
+                    key={c.id}
+                    style={styles.progressChip}
+                    onPress={() => router.push(`/concept/${c.id}`)}
+                    testID={`progress-${c.id}`}
+                  >
+                    <View
+                      style={[
+                        styles.progressChipEmoji,
+                        { backgroundColor: c.color + "22" },
+                      ]}
+                    >
+                      <Text style={{ fontSize: 20 }}>{c.emoji}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.progressChipTitle} numberOfLines={1}>
+                        {c.title}
+                      </Text>
+                      <View style={styles.progressChipBar}>
+                        <View
+                          style={[
+                            styles.progressChipFill,
+                            {
+                              width: `${c.progress * 100}%`,
+                              backgroundColor: c.color,
+                            },
+                          ]}
+                        />
+                      </View>
+                      <Text style={styles.progressChipPct}>
+                        {Math.round(c.progress * 100)}%
+                      </Text>
+                    </View>
+                  </Pressable>
+                ))}
+              </ScrollView>
+
+              <View style={styles.allHeader}>
+                <Text style={styles.sectionTitle}>
+                  {active === "All" ? "All concepts" : active}
+                </Text>
+                <Text style={styles.allCount}>
+                  {filtered.length} concept{filtered.length === 1 ? "" : "s"}
+                </Text>
+              </View>
+            </View>
+          ) : null
+        }
         renderItem={({ item }) => <CourseCard course={item} />}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Feather name="inbox" size={40} color={colors.muted} />
-            <Text style={styles.emptyText}>No concepts found</Text>
+            <Text style={styles.emptyEmoji}>🔍</Text>
+            <Text style={styles.emptyTitle}>No concepts found</Text>
+            <Text style={styles.emptyText}>
+              Try another subject or clear your search.
+            </Text>
           </View>
         }
       />
@@ -125,25 +224,33 @@ function CourseCard({ course }: { course: Course }) {
       testID={`course-${course.id}`}
       onPress={() => router.push(`/concept/${course.id}`)}
     >
-      <View style={[styles.cardCover, { backgroundColor: course.color }]}>
+      <View style={[styles.cardImageBox, { backgroundColor: course.color }]}>
         <Image
           source={{ uri: course.image }}
-          style={styles.cardImage}
+          style={StyleSheet.absoluteFill}
           contentFit="cover"
           transition={150}
         />
-        <View style={styles.cardScrim} />
-        <View style={styles.cardCoverTop}>
-          <View style={[styles.levelPill, { backgroundColor: "rgba(255,255,255,0.95)" }]}>
-            <Text style={[styles.levelText, { color: course.color }]}>{course.level}</Text>
-          </View>
-          <View style={styles.subjectPill}>
-            <Text style={styles.subjectText}>{course.category}</Text>
-          </View>
-        </View>
+        <LinearGradient
+          colors={["rgba(19,22,20,0.05)", "rgba(19,22,20,0.55)"]}
+          style={StyleSheet.absoluteFill}
+        />
         <Text style={styles.cardEmoji}>{course.emoji}</Text>
       </View>
       <View style={styles.cardBody}>
+        <View style={styles.cardTopRow}>
+          <View
+            style={[
+              styles.subjectDot,
+              { backgroundColor: course.color },
+            ]}
+          />
+          <Text style={styles.subjectText}>{course.category}</Text>
+          <View style={styles.dotSpacer} />
+          <View style={styles.levelChip}>
+            <Text style={styles.levelChipText}>{course.level}</Text>
+          </View>
+        </View>
         <Text style={styles.cardTitle} numberOfLines={1}>
           {course.title}
         </Text>
@@ -153,36 +260,37 @@ function CourseCard({ course }: { course: Course }) {
 
         <View style={styles.metaRow}>
           <View style={styles.metaItem}>
-            <Feather name="layers" size={12} color={colors.muted} />
-            <Text style={styles.metaText}>{course.lessons} lessons</Text>
+            <Feather name="layers" size={11} color={colors.muted} />
+            <Text style={styles.metaText}>{course.lessons}</Text>
           </View>
           <View style={styles.metaItem}>
-            <Feather name="clock" size={12} color={colors.muted} />
+            <Feather name="clock" size={11} color={colors.muted} />
             <Text style={styles.metaText}>{course.duration}</Text>
           </View>
-          <View style={styles.metaItem}>
-            <Feather name="zap" size={12} color={colors.brandSecondary} />
-            <Text
-              style={[styles.metaText, { color: colors.onSurface, fontWeight: "700" }]}
-            >
-              {course.xp}
-            </Text>
+          <View style={styles.xpChip}>
+            <Feather name="zap" size={10} color={colors.onBrandSecondary} />
+            <Text style={styles.xpChipText}>{course.xp}</Text>
           </View>
         </View>
 
         {course.progress > 0 ? (
           <View style={styles.progressBlock}>
-            <ProgressBar progress={course.progress} />
-            <Text style={styles.progressText}>
-              {Math.round(course.progress * 100)}% complete
+            <View style={styles.miniBarTrack}>
+              <View
+                style={[
+                  styles.miniBarFill,
+                  {
+                    width: `${course.progress * 100}%`,
+                    backgroundColor: course.color,
+                  },
+                ]}
+              />
+            </View>
+            <Text style={[styles.progressText, { color: course.color }]}>
+              {Math.round(course.progress * 100)}%
             </Text>
           </View>
-        ) : (
-          <View style={styles.startBtn}>
-            <Text style={styles.startBtnText}>Start concept</Text>
-            <Feather name="arrow-right" size={14} color={colors.onBrandPrimary} />
-          </View>
-        )}
+        ) : null}
       </View>
     </Pressable>
   );
@@ -191,52 +299,66 @@ function CourseCard({ course }: { course: Course }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.surface },
   header: {
-    backgroundColor: colors.surface,
+    paddingBottom: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.divider,
-    paddingBottom: spacing.md,
   },
   headerRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
+  },
+  headerBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.brandPrimary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+    marginBottom: spacing.sm,
+  },
+  headerBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: colors.onBrandPrimary,
+    letterSpacing: 0.6,
   },
   title: {
     fontSize: 28,
     fontWeight: "700",
     color: colors.onSurface,
     letterSpacing: -0.6,
-  },
-  subtitle: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: colors.muted,
-    marginTop: 2,
+    lineHeight: 32,
   },
   iconBtn: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.md,
-    backgroundColor: colors.surfaceTertiary,
+    backgroundColor: colors.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: spacing.md,
   },
   searchBar: {
     marginHorizontal: spacing.lg,
-    height: 44,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceTertiary,
+    height: 48,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
     paddingHorizontal: spacing.md,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
     marginBottom: spacing.md,
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
     color: colors.onSurface,
+    fontWeight: "500",
     ...Platform.select({ web: { outlineStyle: "none" as any } }),
   },
   chipRow: {
@@ -246,11 +368,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   chip: {
-    height: 36,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.pill,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: 6,
+    height: 38,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
     flexShrink: 0,
   },
   chipActive: {
@@ -263,9 +386,92 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
   },
-  chipText: { fontSize: 13, fontWeight: "600" },
+  chipEmoji: { fontSize: 14 },
+  chipText: { fontSize: 13, fontWeight: "700" },
 
+  // In progress block
+  inProgressBlock: {
+    marginBottom: spacing.md,
+  },
+  sectionHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.md,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: colors.onSurface,
+    letterSpacing: -0.3,
+  },
+  sectionPill: {
+    backgroundColor: colors.brandPrimary + "18",
+    paddingHorizontal: spacing.md,
+    height: 22,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionPillText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: colors.brandPrimary,
+    letterSpacing: 0.3,
+  },
+  progressChip: {
+    width: 220,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  progressChipEmoji: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.sm,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  progressChipTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.onSurface,
+    marginBottom: 6,
+  },
+  progressChipBar: {
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.surfaceTertiary,
+    overflow: "hidden",
+    marginBottom: 4,
+  },
+  progressChipFill: { height: 4, borderRadius: 2 },
+  progressChipPct: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: colors.muted,
+  },
+  allHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: spacing.xl,
+    marginBottom: 4,
+  },
+  allCount: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.muted,
+  },
+
+  // Card — horizontal
   card: {
+    flexDirection: "row",
     backgroundColor: colors.surfaceSecondary,
     borderRadius: radius.lg,
     borderWidth: 1,
@@ -281,104 +487,130 @@ const styles = StyleSheet.create({
       android: { elevation: 2 },
     }),
   },
-  cardCover: {
-    height: 140,
+  cardImageBox: {
+    width: 108,
     justifyContent: "flex-end",
-    padding: spacing.md,
-    position: "relative",
-  },
-  cardImage: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.55,
-  },
-  cardScrim: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(19,22,20,0.15)",
-  },
-  cardCoverTop: {
-    position: "absolute",
-    top: spacing.md,
-    left: spacing.md,
-    right: spacing.md,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-end",
+    padding: spacing.sm,
   },
   cardEmoji: {
-    position: "absolute",
-    right: spacing.md,
-    bottom: spacing.sm,
-    fontSize: 56,
+    fontSize: 40,
+    textShadowColor: "rgba(0,0,0,0.25)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  subjectPill: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: 4,
-    borderRadius: radius.pill,
-    backgroundColor: "rgba(19,22,20,0.35)",
+  cardBody: {
+    flex: 1,
+    padding: spacing.md,
+  },
+  cardTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  subjectDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
   },
   subjectText: {
-    color: "#FFFFFF",
     fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.3,
+    fontWeight: "800",
+    color: colors.muted,
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
   },
-  levelPill: {
-    alignSelf: "flex-start",
-    paddingHorizontal: spacing.md,
-    paddingVertical: 4,
+  dotSpacer: { flex: 1 },
+  levelChip: {
+    backgroundColor: colors.surfaceTertiary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: radius.pill,
   },
-  levelText: {
-    color: colors.onBrandPrimary,
-    fontSize: 11,
+  levelChipText: {
+    fontSize: 10,
     fontWeight: "700",
-    letterSpacing: 0.3,
+    color: colors.onSurface,
   },
-  cardBody: { padding: spacing.lg },
   cardTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "700",
     color: colors.onSurface,
     letterSpacing: -0.3,
+    marginBottom: 2,
   },
   cardSubtitle: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "500",
     color: colors.muted,
-    marginTop: 2,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   metaRow: {
     flexDirection: "row",
-    gap: spacing.lg,
-    marginBottom: spacing.md,
+    alignItems: "center",
+    gap: spacing.md,
+    marginBottom: 6,
   },
-  metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
-  metaText: { fontSize: 12, color: colors.muted, fontWeight: "500" },
-  progressBlock: { gap: 6 },
-  progressText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: colors.brandPrimary,
-  },
-  startBtn: {
+  metaItem: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    height: 42,
+    gap: 3,
+  },
+  metaText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: colors.muted,
+  },
+  xpChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: colors.brandSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: radius.pill,
-    backgroundColor: colors.brandPrimary,
+    marginLeft: "auto",
   },
-  startBtnText: {
-    color: colors.onBrandPrimary,
-    fontSize: 14,
-    fontWeight: "700",
+  xpChipText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: colors.onBrandSecondary,
   },
+  progressBlock: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginTop: 4,
+  },
+  miniBarTrack: {
+    flex: 1,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.surfaceTertiary,
+    overflow: "hidden",
+  },
+  miniBarFill: { height: 4, borderRadius: 2 },
+  progressText: {
+    fontSize: 11,
+    fontWeight: "800",
+  },
+
+  // Empty
   empty: {
     alignItems: "center",
     paddingVertical: spacing.xxxl,
-    gap: spacing.md,
+    gap: 4,
   },
-  emptyText: { fontSize: 14, fontWeight: "500", color: colors.muted },
+  emptyEmoji: { fontSize: 48, marginBottom: spacing.sm },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+  emptyText: {
+    fontSize: 13,
+    color: colors.muted,
+    fontWeight: "500",
+  },
 });
