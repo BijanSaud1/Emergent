@@ -79,15 +79,66 @@ export type FactOfTheDay = {
 export const user = {
   name: "Alex Rivera",
   handle: "@alex.thinks",
+  bio: "Curious mind on a 27-day streak · Loves psychology & the universe",
+  location: "San Francisco",
+  joined: "Feb 2025",
   avatar:
     "https://images.unsplash.com/photo-1686149130428-6609121863b7?crop=entropy&cs=srgb&fm=jpg&w=400&q=85",
   streak: 27,
+  longestStreak: 41,
   xp: 4820,
   rank: 142,
   coursesCompleted: 8,
   level: 12,
   nextLevelXp: 5000,
+  minutesToday: 24,
+  minutesWeek: 148,
 };
+
+// Last 7 days of minutes learned (Mon-Sun)
+export const weeklyActivity: { day: string; minutes: number; isToday?: boolean }[] = [
+  { day: "M", minutes: 22 },
+  { day: "T", minutes: 15 },
+  { day: "W", minutes: 30 },
+  { day: "T", minutes: 8 },
+  { day: "F", minutes: 26 },
+  { day: "S", minutes: 23 },
+  { day: "S", minutes: 24, isToday: true },
+];
+
+export const favoriteSubjects = [
+  { id: "s1", label: "Psychology", emoji: "🧠", color: "#FF5277" },
+  { id: "s2", label: "Biology", emoji: "🌿", color: "#04B077" },
+  { id: "s3", label: "Physics", emoji: "⚛️", color: "#FFC800" },
+  { id: "s4", label: "Philosophy", emoji: "🚋", color: "#131614" },
+];
+
+export const recentlyMastered = [
+  {
+    id: "1",
+    title: "Solomon's Paradox",
+    subject: "Psychology",
+    emoji: "🧠",
+    color: "#FF5277",
+    daysAgo: "Today",
+  },
+  {
+    id: "2",
+    title: "Photosynthesis",
+    subject: "Biology",
+    emoji: "🌿",
+    color: "#04B077",
+    daysAgo: "2d ago",
+  },
+  {
+    id: "7",
+    title: "Cognitive Dissonance",
+    subject: "Psychology",
+    emoji: "🌀",
+    color: "#FF5277",
+    daysAgo: "5d ago",
+  },
+];
 
 export const continueLearning = {
   id: "c-1",

@@ -8,13 +8,20 @@ import {
   Platform,
 } from "react-native";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@react-native-vector-icons/feather";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
 import { usesNativeTabs } from "@/src/navigation";
-import { ProgressBar } from "@/src/components/progress-bar";
-import { user, badges } from "@/src/data/mock";
+import {
+  user,
+  badges,
+  weeklyActivity,
+  favoriteSubjects,
+  recentlyMastered,
+} from "@/src/data/mock";
 
 const settings = [
   { id: "notif", label: "Notifications", icon: "bell" as const },
@@ -26,96 +33,272 @@ const settings = [
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
   const scrollPadBottom = spacing.xxl;
 
   const levelProgress = user.xp / user.nextLevelXp;
+  const maxMinutes = Math.max(...weeklyActivity.map((d) => d.minutes));
 
   return (
     <View style={styles.container} testID="profile-screen">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: insets.top + spacing.md,
           paddingBottom: scrollPadBottom + bottomChrome,
         }}
       >
-        {/* Header actions */}
-        <View style={styles.topBar}>
-          <Text style={styles.topTitle}>Profile</Text>
-          <Pressable style={styles.iconBtn} testID="settings-btn">
-            <Feather name="settings" size={18} color={colors.onSurface} />
-          </Pressable>
-        </View>
+        {/* Gradient hero */}
+        <LinearGradient
+          colors={["#04B077", "#FFC800"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.hero, { paddingTop: insets.top + spacing.md }]}
+        >
+          <View style={styles.heroTopBar}>
+            <Pressable style={styles.iconBtn} testID="share-btn">
+              <Feather name="share-2" size={16} color={colors.onSurface} />
+            </Pressable>
+            <Pressable style={styles.iconBtn} testID="settings-btn">
+              <Feather name="settings" size={16} color={colors.onSurface} />
+            </Pressable>
+          </View>
 
-        {/* Avatar block */}
-        <View style={styles.avatarBlock}>
-          <View style={styles.avatarRing}>
-            <Image
-              source={{ uri: user.avatar }}
-              style={styles.avatar}
-              contentFit="cover"
-              transition={200}
-            />
-            <View style={styles.levelChip}>
-              <Text style={styles.levelChipText}>Lv {user.level}</Text>
+          <View style={styles.heroContent}>
+            <View style={styles.avatarWrap}>
+              <View style={styles.avatarRing}>
+                <Image
+                  source={{ uri: user.avatar }}
+                  style={styles.avatar}
+                  contentFit="cover"
+                  transition={200}
+                />
+              </View>
+              <View style={styles.levelChip}>
+                <Feather name="zap" size={11} color={colors.onBrandSecondary} />
+                <Text style={styles.levelChipText}>Lv {user.level}</Text>
+              </View>
+            </View>
+
+            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.handle}>{user.handle}</Text>
+            <Text style={styles.bio} numberOfLines={2}>
+              {user.bio}
+            </Text>
+
+            <View style={styles.metaRow}>
+              <View style={styles.metaItem}>
+                <Feather name="map-pin" size={11} color="#FFFFFF" />
+                <Text style={styles.metaText}>{user.location}</Text>
+              </View>
+              <Text style={styles.metaDot}>·</Text>
+              <View style={styles.metaItem}>
+                <Feather name="calendar" size={11} color="#FFFFFF" />
+                <Text style={styles.metaText}>Joined {user.joined}</Text>
+              </View>
             </View>
           </View>
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.handle}>{user.handle}</Text>
+        </LinearGradient>
 
-          <View style={styles.xpBar}>
-            <View style={styles.xpBarLabel}>
-              <Text style={styles.xpBarText}>
-                {user.xp} / {user.nextLevelXp} XP
+        {/* Floating level card overlapping hero */}
+        <View style={styles.levelCardWrap}>
+          <View style={styles.levelCard} testID="level-card">
+            <View style={styles.levelRow}>
+              <View>
+                <Text style={styles.levelKicker}>LEVEL {user.level}</Text>
+                <Text style={styles.levelTitle}>Curious Thinker</Text>
+              </View>
+              <View style={styles.nextLevelPill}>
+                <Text style={styles.nextLevelText}>
+                  Level {user.level + 1}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.levelBarTrack}>
+              <LinearGradient
+                colors={[colors.brandPrimary, "#02C58A"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[
+                  styles.levelBarFill,
+                  { width: `${levelProgress * 100}%` },
+                ]}
+              />
+            </View>
+            <View style={styles.levelBarLabel}>
+              <Text style={styles.levelBarText}>
+                {user.xp.toLocaleString()} XP
               </Text>
-              <Text style={[styles.xpBarText, { color: colors.brandPrimary }]}>
-                Level {user.level + 1}
+              <Text style={styles.levelBarMuted}>
+                {(user.nextLevelXp - user.xp).toLocaleString()} XP to next level
               </Text>
             </View>
-            <ProgressBar progress={levelProgress} height={10} />
           </View>
         </View>
 
-        {/* Stats 2x2 */}
-        <View style={styles.statsGrid}>
-          <StatCard
-            icon="zap"
-            iconColor={colors.brandSecondary}
-            iconBg={colors.brandSecondary + "22"}
-            label="Day Streak"
+        {/* Compact stat strip */}
+        <View style={styles.statStrip} testID="stats-strip">
+          <StatMini
+            emoji="🔥"
             value={String(user.streak)}
+            label="Streak"
+            tint={colors.brandSecondary + "22"}
           />
-          <StatCard
-            icon="award"
-            iconColor={colors.brandPrimary}
-            iconBg={colors.brandPrimary + "22"}
-            label="Total XP"
+          <View style={styles.statDivider} />
+          <StatMini
+            emoji="⭐"
             value={user.xp.toLocaleString()}
+            label="Total XP"
+            tint={colors.brandPrimary + "22"}
           />
-          <StatCard
-            icon="book-open"
-            iconColor={colors.brandTertiary}
-            iconBg={colors.brandTertiary + "22"}
-            label="Courses"
+          <View style={styles.statDivider} />
+          <StatMini
+            emoji="📚"
             value={String(user.coursesCompleted)}
+            label="Learned"
+            tint={colors.brandTertiary + "22"}
           />
-          <StatCard
-            icon="trending-up"
-            iconColor={colors.onSurface}
-            iconBg={colors.surfaceTertiary}
-            label="Global Rank"
+          <View style={styles.statDivider} />
+          <StatMini
+            emoji="🏅"
             value={`#${user.rank}`}
+            label="Rank"
+            tint={colors.surfaceTertiary}
           />
+        </View>
+
+        {/* Weekly activity chart */}
+        <View style={styles.section}>
+          <View style={styles.sectionRow}>
+            <Text style={styles.sectionTitle}>This week</Text>
+            <View style={styles.minutesPill}>
+              <Feather name="clock" size={11} color={colors.brandPrimary} />
+              <Text style={styles.minutesText}>{user.minutesWeek} min</Text>
+            </View>
+          </View>
+          <View style={styles.chartCard} testID="weekly-chart">
+            <View style={styles.chart}>
+              {weeklyActivity.map((d, idx) => {
+                const h = Math.max(6, (d.minutes / maxMinutes) * 96);
+                const isToday = !!d.isToday;
+                return (
+                  <View key={idx} style={styles.chartCol}>
+                    <View style={styles.chartBarWrap}>
+                      {isToday ? (
+                        <LinearGradient
+                          colors={[colors.brandPrimary, "#02C58A"]}
+                          style={[styles.chartBar, { height: h }]}
+                        />
+                      ) : (
+                        <View
+                          style={[
+                            styles.chartBar,
+                            {
+                              height: h,
+                              backgroundColor: colors.brandPrimary + "33",
+                            },
+                          ]}
+                        />
+                      )}
+                    </View>
+                    <Text
+                      style={[
+                        styles.chartDay,
+                        isToday && { color: colors.brandPrimary, fontWeight: "700" },
+                      ]}
+                    >
+                      {d.day}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+            <View style={styles.chartFooter}>
+              <View>
+                <Text style={styles.chartFooterValue}>
+                  {user.minutesToday} min
+                </Text>
+                <Text style={styles.chartFooterLabel}>Today</Text>
+              </View>
+              <View style={{ alignItems: "flex-end" }}>
+                <Text style={styles.chartFooterValue}>
+                  {user.longestStreak} days
+                </Text>
+                <Text style={styles.chartFooterLabel}>Longest streak</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Favorite subjects */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Favorite subjects</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.subjectsRow}
+          >
+            {favoriteSubjects.map((s) => (
+              <View
+                key={s.id}
+                style={[
+                  styles.subjectPill,
+                  { backgroundColor: s.color + "18", borderColor: s.color + "55" },
+                ]}
+                testID={`subject-${s.id}`}
+              >
+                <Text style={styles.subjectEmoji}>{s.emoji}</Text>
+                <Text style={styles.subjectLabel}>{s.label}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Recently mastered */}
+        <View style={styles.section}>
+          <View style={styles.sectionRow}>
+            <Text style={styles.sectionTitle}>Recently mastered</Text>
+            <Text style={styles.seeAll}>See all</Text>
+          </View>
+          <View style={styles.masteredList}>
+            {recentlyMastered.map((m) => (
+              <Pressable
+                key={m.id}
+                onPress={() => router.push(`/concept/${m.id}`)}
+                style={styles.masteredRow}
+                testID={`mastered-${m.id}`}
+              >
+                <View
+                  style={[
+                    styles.masteredEmoji,
+                    { backgroundColor: m.color + "22" },
+                  ]}
+                >
+                  <Text style={styles.masteredEmojiText}>{m.emoji}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.masteredTitle}>{m.title}</Text>
+                  <Text style={styles.masteredSub}>
+                    {m.subject} · {m.daysAgo}
+                  </Text>
+                </View>
+                <View style={styles.doneCheck}>
+                  <Feather name="check" size={14} color={colors.onSuccess} />
+                </View>
+              </Pressable>
+            ))}
+          </View>
         </View>
 
         {/* Badges */}
         <View style={styles.section}>
           <View style={styles.sectionRow}>
             <Text style={styles.sectionTitle}>Badges</Text>
-            <Text style={styles.sectionMeta}>
-              {badges.filter((b) => b.earned).length}/{badges.length}
-            </Text>
+            <View style={styles.badgesCount}>
+              <Text style={styles.badgesCountText}>
+                {badges.filter((b) => b.earned).length}/{badges.length}
+              </Text>
+            </View>
           </View>
           <View style={styles.badgeGrid}>
             {badges.map((b) => (
@@ -136,13 +319,15 @@ export default function ProfileScreen() {
                   ]}
                 >
                   <Text
-                    style={[
-                      styles.badgeEmoji,
-                      !b.earned && { opacity: 0.35 },
-                    ]}
+                    style={[styles.badgeEmoji, !b.earned && { opacity: 0.35 }]}
                   >
                     {b.emoji}
                   </Text>
+                  {!b.earned && (
+                    <View style={styles.lockOverlay}>
+                      <Feather name="lock" size={12} color={colors.muted} />
+                    </View>
+                  )}
                 </View>
                 <Text
                   style={[
@@ -201,137 +386,251 @@ export default function ProfileScreen() {
   );
 }
 
-function StatCard({
-  icon,
-  iconColor,
-  iconBg,
-  label,
+function StatMini({
+  emoji,
   value,
+  label,
+  tint,
 }: {
-  icon: React.ComponentProps<typeof Feather>["name"];
-  iconColor: string;
-  iconBg: string;
-  label: string;
+  emoji: string;
   value: string;
+  label: string;
+  tint: string;
 }) {
   return (
-    <View style={styles.statCard} testID={`stat-${label}`}>
-      <View style={[styles.statIcon, { backgroundColor: iconBg }]}>
-        <Feather name={icon} size={16} color={iconColor} />
+    <View style={styles.statMini}>
+      <View style={[styles.statMiniIcon, { backgroundColor: tint }]}>
+        <Text style={{ fontSize: 16 }}>{emoji}</Text>
       </View>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+      <Text style={styles.statMiniValue}>{value}</Text>
+      <Text style={styles.statMiniLabel}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.surface },
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+
+  // Hero gradient
+  hero: {
+    paddingBottom: 88, // leaves room for overlapping level card
     paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
   },
-  topTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: colors.onSurface,
-    letterSpacing: -0.4,
+  heroTopBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: spacing.lg,
   },
   iconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceTertiary,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255,255,255,0.95)",
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarBlock: { alignItems: "center", paddingHorizontal: spacing.lg },
-  avatarRing: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
-    padding: 4,
-    borderWidth: 3,
-    borderColor: colors.brandPrimary,
-    alignItems: "center",
-    justifyContent: "center",
+  heroContent: { alignItems: "center" },
+  avatarWrap: {
     marginBottom: spacing.md,
   },
-  avatar: { width: 96, height: 96, borderRadius: 48 },
+  avatarRing: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    padding: 4,
+    backgroundColor: "rgba(255,255,255,0.35)",
+    alignItems: "center",
+    justifyContent: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  avatar: {
+    width: 104,
+    height: 104,
+    borderRadius: 52,
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+  },
   levelChip: {
     position: "absolute",
-    bottom: -4,
+    bottom: -6,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
     backgroundColor: colors.brandSecondary,
     paddingHorizontal: 10,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: radius.pill,
     borderWidth: 2,
-    borderColor: colors.surface,
+    borderColor: "#FFFFFF",
   },
   levelChipText: {
     fontSize: 11,
-    fontWeight: "700",
+    fontWeight: "800",
     color: colors.onBrandSecondary,
+    letterSpacing: 0.3,
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "700",
-    color: colors.onSurface,
+    color: "#FFFFFF",
     letterSpacing: -0.4,
+    marginTop: spacing.md,
   },
   handle: {
     fontSize: 13,
-    fontWeight: "500",
-    color: colors.muted,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.85)",
     marginTop: 2,
   },
-  xpBar: { width: "100%", marginTop: spacing.lg, gap: 6 },
-  xpBarLabel: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  bio: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "rgba(255,255,255,0.9)",
+    textAlign: "center",
+    marginTop: spacing.md,
+    lineHeight: 19,
+    paddingHorizontal: spacing.md,
   },
-  xpBarText: { fontSize: 12, fontWeight: "600", color: colors.onSurface },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: spacing.md,
+  },
+  metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
+  metaText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  metaDot: { color: "#FFFFFF", opacity: 0.7 },
 
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+  // Floating level card
+  levelCardWrap: {
     paddingHorizontal: spacing.lg,
-    marginTop: spacing.xl,
-    gap: spacing.md,
+    marginTop: -68,
   },
-  statCard: {
-    width: "48%",
+  levelCard: {
     backgroundColor: colors.surfaceSecondary,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.08,
+        shadowRadius: 20,
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  levelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: spacing.md,
+  },
+  levelKicker: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: colors.brandPrimary,
+    letterSpacing: 0.5,
+  },
+  levelTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.onSurface,
+    letterSpacing: -0.3,
+    marginTop: 2,
+  },
+  nextLevelPill: {
+    backgroundColor: colors.surfaceTertiary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+  },
+  nextLevelText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+  levelBarTrack: {
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.surfaceTertiary,
+    overflow: "hidden",
+  },
+  levelBarFill: {
+    height: 12,
+    borderRadius: 6,
+  },
+  levelBarLabel: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  levelBarText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+  levelBarMuted: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: colors.muted,
+  },
+
+  // Stat strip
+  statStrip: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
     padding: spacing.md,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  statIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: radius.sm,
+  statMini: { flex: 1, alignItems: "center" },
+  statMiniIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: spacing.md,
+    marginBottom: 6,
   },
-  statValue: {
-    fontSize: 22,
+  statMiniValue: {
+    fontSize: 15,
     fontWeight: "700",
     color: colors.onSurface,
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
   },
-  statLabel: {
-    fontSize: 12,
+  statMiniLabel: {
+    fontSize: 10,
+    fontWeight: "600",
     color: colors.muted,
-    fontWeight: "500",
     marginTop: 2,
   },
+  statDivider: {
+    width: StyleSheet.hairlineWidth,
+    height: 40,
+    backgroundColor: colors.border,
+  },
 
+  // Section basics
   section: { marginTop: spacing.xl, paddingHorizontal: spacing.lg },
   sectionRow: {
     flexDirection: "row",
@@ -346,13 +645,156 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     marginBottom: spacing.md,
   },
-  sectionMeta: {
+  seeAll: {
     fontSize: 13,
-    color: colors.brandPrimary,
     fontWeight: "700",
+    color: colors.brandPrimary,
     marginBottom: spacing.md,
   },
+  minutesPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: spacing.md,
+    height: 26,
+    borderRadius: radius.pill,
+    backgroundColor: colors.brandPrimary + "18",
+    marginBottom: spacing.md,
+  },
+  minutesText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.brandPrimary,
+  },
 
+  // Chart
+  chartCard: {
+    padding: spacing.lg,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  chart: {
+    height: 120,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    marginBottom: spacing.md,
+  },
+  chartCol: { alignItems: "center", flex: 1 },
+  chartBarWrap: {
+    width: 22,
+    height: 100,
+    justifyContent: "flex-end",
+    marginBottom: 6,
+  },
+  chartBar: {
+    width: 22,
+    borderRadius: 6,
+    minHeight: 6,
+  },
+  chartDay: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: colors.muted,
+  },
+  chartFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingTop: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.divider,
+  },
+  chartFooterValue: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+  chartFooterLabel: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: colors.muted,
+    marginTop: 2,
+  },
+
+  // Subjects
+  subjectsRow: { gap: spacing.sm, paddingRight: spacing.lg },
+  subjectPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: spacing.md,
+    height: 40,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+  },
+  subjectEmoji: { fontSize: 16 },
+  subjectLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+
+  // Mastered
+  masteredList: {
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: "hidden",
+  },
+  masteredRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.divider,
+  },
+  masteredEmoji: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  masteredEmojiText: { fontSize: 22 },
+  masteredTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+  masteredSub: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: colors.muted,
+    marginTop: 2,
+  },
+  doneCheck: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.success,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  // Badges
+  badgesCount: {
+    backgroundColor: colors.brandPrimary + "18",
+    paddingHorizontal: spacing.md,
+    height: 26,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.md,
+  },
+  badgesCountText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: colors.brandPrimary,
+  },
   badgeGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -360,15 +802,29 @@ const styles = StyleSheet.create({
   },
   badgeItem: { width: "30%", alignItems: "center" },
   badgeCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 6,
+    position: "relative",
   },
-  badgeEmoji: { fontSize: 28 },
+  badgeEmoji: { fontSize: 30 },
+  lockOverlay: {
+    position: "absolute",
+    right: -2,
+    bottom: -2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   badgeLabel: {
     fontSize: 11,
     fontWeight: "600",
@@ -376,21 +832,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+  // Settings
   settingsCard: {
     backgroundColor: colors.surfaceSecondary,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: "hidden",
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 6,
-      },
-      android: { elevation: 1 },
-    }),
   },
   settingRow: {
     flexDirection: "row",
