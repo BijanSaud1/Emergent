@@ -293,53 +293,173 @@ export default function ProfileScreen() {
         {/* Badges */}
         <View style={styles.section}>
           <View style={styles.sectionRow}>
-            <Text style={styles.sectionTitle}>Badges</Text>
+            <Text style={styles.sectionTitle}>Achievements</Text>
             <View style={styles.badgesCount}>
+              <Feather name="award" size={11} color={colors.brandPrimary} />
               <Text style={styles.badgesCountText}>
-                {badges.filter((b) => b.earned).length}/{badges.length}
+                {badges.filter((b) => b.earned).length} of {badges.length}
               </Text>
             </View>
           </View>
-          <View style={styles.badgeGrid}>
-            {badges.map((b) => (
-              <View
-                key={b.id}
-                style={styles.badgeItem}
-                testID={`badge-${b.id}`}
-              >
-                <View
-                  style={[
-                    styles.badgeCircle,
-                    {
-                      backgroundColor: b.earned
-                        ? b.color + "22"
-                        : colors.surfaceTertiary,
-                      borderColor: b.earned ? b.color : colors.border,
-                    },
-                  ]}
+
+          {/* Latest achievement featured card */}
+          {(() => {
+            const latest = [...badges]
+              .filter((b) => b.earned)
+              .slice(-1)[0];
+            if (!latest) return null;
+            return (
+              <View style={styles.latestCard} testID="latest-badge">
+                <LinearGradient
+                  colors={[latest.color, latest.color + "CC"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.latestGradient}
                 >
-                  <Text
-                    style={[styles.badgeEmoji, !b.earned && { opacity: 0.35 }]}
-                  >
-                    {b.emoji}
-                  </Text>
-                  {!b.earned && (
-                    <View style={styles.lockOverlay}>
-                      <Feather name="lock" size={12} color={colors.muted} />
+                  <View style={styles.latestBurst}>
+                    {[...Array(8)].map((_, i) => (
+                      <View
+                        key={i}
+                        style={[
+                          styles.burstRay,
+                          { transform: [{ rotate: `${i * 45}deg` }] },
+                        ]}
+                      />
+                    ))}
+                  </View>
+
+                  <View style={styles.latestInfo}>
+                    <View style={styles.latestKickerRow}>
+                      <Feather name="star" size={11} color="#FFFFFF" />
+                      <Text style={styles.latestKicker}>NEWEST · {latest.tier.toUpperCase()}</Text>
                     </View>
-                  )}
-                </View>
-                <Text
-                  style={[
-                    styles.badgeLabel,
-                    !b.earned && { color: colors.muted },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {b.name}
-                </Text>
+                    <Text style={styles.latestName}>{latest.name}</Text>
+                    <Text style={styles.latestDesc} numberOfLines={2}>
+                      {latest.description}
+                    </Text>
+                    <View style={styles.latestFooter}>
+                      <Feather name="calendar" size={11} color="rgba(255,255,255,0.85)" />
+                      <Text style={styles.latestDate}>Earned {latest.earnedOn}</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.latestEmojiWrap}>
+                    <Text style={styles.latestEmoji}>{latest.emoji}</Text>
+                  </View>
+                </LinearGradient>
               </View>
-            ))}
+            );
+          })()}
+
+          {/* Earned trophy shelf */}
+          <Text style={styles.subheader}>Trophy shelf</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.shelfRow}
+          >
+            {badges
+              .filter((b) => b.earned)
+              .map((b) => (
+                <View key={b.id} style={styles.trophyCard} testID={`trophy-${b.id}`}>
+                  <View
+                    style={[
+                      styles.trophyCircle,
+                      {
+                        borderColor: b.color,
+                        backgroundColor: b.color + "18",
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[styles.trophyInner, { backgroundColor: b.color }]}
+                    >
+                      <Text style={styles.trophyEmoji}>{b.emoji}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.trophyName} numberOfLines={1}>
+                    {b.name}
+                  </Text>
+                  <View
+                    style={[
+                      styles.tierPill,
+                      { backgroundColor: tierColor(b.tier) + "22" },
+                    ]}
+                  >
+                    <Text style={[styles.tierText, { color: tierColor(b.tier) }]}>
+                      {b.tier}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+          </ScrollView>
+
+          {/* In-progress badges */}
+          <Text style={styles.subheader}>In progress</Text>
+          <View style={styles.progressList}>
+            {badges
+              .filter((b) => !b.earned)
+              .map((b) => (
+                <View
+                  key={b.id}
+                  style={styles.progressCard}
+                  testID={`progress-badge-${b.id}`}
+                >
+                  <View
+                    style={[
+                      styles.progressEmojiBox,
+                      { backgroundColor: colors.surfaceTertiary },
+                    ]}
+                  >
+                    <Text style={styles.progressEmoji}>{b.emoji}</Text>
+                    <View style={styles.lockPill}>
+                      <Feather name="lock" size={10} color={colors.muted} />
+                    </View>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.progressTopRow}>
+                      <Text style={styles.progressName} numberOfLines={1}>
+                        {b.name}
+                      </Text>
+                      <View
+                        style={[
+                          styles.tierPill,
+                          {
+                            backgroundColor: tierColor(b.tier) + "22",
+                            marginLeft: spacing.sm,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.tierText, { color: tierColor(b.tier) }]}
+                        >
+                          {b.tier}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={styles.progressDesc} numberOfLines={1}>
+                      {b.description}
+                    </Text>
+                    <View style={styles.progressBarTrack}>
+                      <View
+                        style={[
+                          styles.progressBarFill,
+                          {
+                            width: `${(b.progress ?? 0) * 100}%`,
+                            backgroundColor: b.color,
+                          },
+                        ]}
+                      />
+                    </View>
+                    <View style={styles.progressBottomRow}>
+                      <Text style={styles.progressReq}>{b.requirement}</Text>
+                      <Text style={[styles.progressPct, { color: b.color }]}>
+                        {Math.round((b.progress ?? 0) * 100)}%
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
           </View>
         </View>
 
@@ -384,6 +504,19 @@ export default function ProfileScreen() {
       </ScrollView>
     </View>
   );
+}
+
+function tierColor(tier: "Common" | "Rare" | "Epic" | "Legendary") {
+  switch (tier) {
+    case "Common":
+      return colors.muted;
+    case "Rare":
+      return colors.brandPrimary;
+    case "Epic":
+      return colors.brandTertiary;
+    case "Legendary":
+      return "#FF9900";
+  }
 }
 
 function StatMini({
@@ -780,14 +913,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // Badges
+  // Badges — new showcase
   badgesCount: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
     backgroundColor: colors.brandPrimary + "18",
     paddingHorizontal: spacing.md,
     height: 26,
     borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: spacing.md,
   },
   badgesCountText: {
@@ -795,27 +929,183 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.brandPrimary,
   },
-  badgeGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.md,
+
+  subheader: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
   },
-  badgeItem: { width: "30%", alignItems: "center" },
-  badgeCircle: {
+
+  // Latest featured card
+  latestCard: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
+      },
+      android: { elevation: 5 },
+    }),
+  },
+  latestGradient: {
+    padding: spacing.lg,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    overflow: "hidden",
+  },
+  latestBurst: {
+    position: "absolute",
+    right: -30,
+    top: "50%",
+    width: 260,
+    height: 260,
+    marginTop: -130,
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0.35,
+  },
+  burstRay: {
+    position: "absolute",
+    width: 2,
+    height: 260,
+    backgroundColor: "#FFFFFF",
+    opacity: 0.4,
+  },
+  latestInfo: { flex: 1, zIndex: 1 },
+  latestKickerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginBottom: 6,
+  },
+  latestKicker: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    letterSpacing: 0.8,
+  },
+  latestName: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    letterSpacing: -0.4,
+    marginBottom: 4,
+  },
+  latestDesc: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "rgba(255,255,255,0.9)",
+    lineHeight: 18,
+    marginBottom: spacing.md,
+  },
+  latestFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  latestDate: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "rgba(255,255,255,0.9)",
+  },
+  latestEmojiWrap: {
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    backgroundColor: "rgba(255,255,255,0.28)",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+    borderWidth: 3,
+    borderColor: "rgba(255,255,255,0.55)",
+  },
+  latestEmoji: { fontSize: 48 },
+
+  // Trophy shelf
+  shelfRow: {
+    gap: spacing.md,
+    paddingRight: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  trophyCard: {
+    width: 108,
+    alignItems: "center",
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+  },
+  trophyCircle: {
     width: 68,
     height: 68,
     borderRadius: 34,
     borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 6,
+    marginBottom: spacing.sm,
+    padding: 4,
+  },
+  trophyInner: {
+    flex: 1,
+    width: "100%",
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  trophyEmoji: { fontSize: 28 },
+  trophyName: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.onSurface,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  tierPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: radius.pill,
+  },
+  tierText: {
+    fontSize: 9,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+
+  // In progress
+  progressList: { gap: spacing.md },
+  progressCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  progressEmojiBox: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
     position: "relative",
   },
-  badgeEmoji: { fontSize: 30 },
-  lockOverlay: {
+  progressEmoji: { fontSize: 28, opacity: 0.4 },
+  lockPill: {
     position: "absolute",
-    right: -2,
-    bottom: -2,
+    right: -3,
+    bottom: -3,
     width: 22,
     height: 22,
     borderRadius: 11,
@@ -825,11 +1115,46 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  badgeLabel: {
+  progressTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  progressName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+  progressDesc: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: colors.muted,
+    marginBottom: 8,
+  },
+  progressBarTrack: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.surfaceTertiary,
+    overflow: "hidden",
+    marginBottom: 6,
+  },
+  progressBarFill: {
+    height: 6,
+    borderRadius: 3,
+  },
+  progressBottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  progressReq: {
     fontSize: 11,
     fontWeight: "600",
-    color: colors.onSurface,
-    textAlign: "center",
+    color: colors.muted,
+  },
+  progressPct: {
+    fontSize: 11,
+    fontWeight: "800",
   },
 
   // Settings

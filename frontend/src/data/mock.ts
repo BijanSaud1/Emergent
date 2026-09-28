@@ -39,9 +39,14 @@ export type LeaderboardEntry = {
 export type Badge = {
   id: string;
   name: string;
+  description: string;
   emoji: string;
   color: string;
+  tier: "Common" | "Rare" | "Epic" | "Legendary";
   earned: boolean;
+  earnedOn?: string;
+  progress?: number; // 0..1 for unearned badges
+  requirement?: string;
 };
 
 export type Lesson = {
@@ -416,15 +421,99 @@ export const leaderboard: LeaderboardEntry[] = [
 ];
 
 export const badges: Badge[] = [
-  { id: "b1", name: "First Idea", emoji: "💡", color: "#FFC800", earned: true },
-  { id: "b2", name: "Streak 7", emoji: "🔥", color: "#FF5277", earned: true },
-  { id: "b3", name: "Streak 30", emoji: "⚡", color: "#FFC800", earned: false },
-  { id: "b4", name: "Bio Scholar", emoji: "🌿", color: "#04B077", earned: true },
-  { id: "b5", name: "Night Owl", emoji: "🌙", color: "#131614", earned: true },
-  { id: "b6", name: "Deep Thinker", emoji: "🧠", color: "#FF5277", earned: false },
-  { id: "b7", name: "Curious Mind", emoji: "🔎", color: "#FFC800", earned: true },
-  { id: "b8", name: "Polymath", emoji: "🏆", color: "#04B077", earned: false },
-  { id: "b9", name: "Explorer", emoji: "🗺️", color: "#FF5277", earned: true },
+  {
+    id: "b1",
+    name: "First Idea",
+    description: "Completed your first concept",
+    emoji: "💡",
+    color: "#FFC800",
+    tier: "Common",
+    earned: true,
+    earnedOn: "Feb 12",
+  },
+  {
+    id: "b2",
+    name: "Streak 7",
+    description: "Learned for 7 days in a row",
+    emoji: "🔥",
+    color: "#FF5277",
+    tier: "Rare",
+    earned: true,
+    earnedOn: "Feb 20",
+  },
+  {
+    id: "b4",
+    name: "Bio Scholar",
+    description: "Finished 5 biology concepts",
+    emoji: "🌿",
+    color: "#04B077",
+    tier: "Rare",
+    earned: true,
+    earnedOn: "Mar 02",
+  },
+  {
+    id: "b5",
+    name: "Night Owl",
+    description: "Studied after 10 PM 5 times",
+    emoji: "🌙",
+    color: "#131614",
+    tier: "Common",
+    earned: true,
+    earnedOn: "Mar 08",
+  },
+  {
+    id: "b7",
+    name: "Curious Mind",
+    description: "Saved 10 facts of the day",
+    emoji: "🔎",
+    color: "#FFC800",
+    tier: "Rare",
+    earned: true,
+    earnedOn: "Mar 15",
+  },
+  {
+    id: "b9",
+    name: "Explorer",
+    description: "Tried concepts from 4 subjects",
+    emoji: "🗺️",
+    color: "#FF5277",
+    tier: "Epic",
+    earned: true,
+    earnedOn: "Today",
+  },
+  {
+    id: "b3",
+    name: "Streak 30",
+    description: "Learn for 30 days in a row",
+    emoji: "⚡",
+    color: "#FFC800",
+    tier: "Epic",
+    earned: false,
+    progress: 27 / 30,
+    requirement: "27 / 30 days",
+  },
+  {
+    id: "b6",
+    name: "Deep Thinker",
+    description: "Score 100% on 3 quizzes",
+    emoji: "🧠",
+    color: "#FF5277",
+    tier: "Epic",
+    earned: false,
+    progress: 1 / 3,
+    requirement: "1 / 3 perfect quizzes",
+  },
+  {
+    id: "b8",
+    name: "Polymath",
+    description: "Master concepts from all 5 subjects",
+    emoji: "🏆",
+    color: "#04B077",
+    tier: "Legendary",
+    earned: false,
+    progress: 3 / 5,
+    requirement: "3 / 5 subjects mastered",
+  },
 ];
 
 export const learningPaths = [
