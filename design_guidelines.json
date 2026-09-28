@@ -1,0 +1,167 @@
+{
+  "app_name": "CodeQuest",
+  "personality": "4 Tactile / Playful LIGHT",
+  "personality_one_liner": "A vibrant, gamified learning experience that makes coding feel like play, rewarding consistency with satisfying, chunky tactile interactions.",
+  "color": {
+    "surface": "#FCFCF9",
+    "onSurface": "#131614",
+    "surfaceSecondary": "#FFFFFF",
+    "onSurfaceSecondary": "#131614",
+    "surfaceTertiary": "#F2F2ED",
+    "onSurfaceTertiary": "#131614",
+    "surfaceInverse": "#1A1D1B",
+    "onSurfaceInverse": "#FFFFFF",
+    "brand": "#04B077",
+    "onBrand": "#FFFFFF",
+    "brandPrimary": "#04B077",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#FFC800",
+    "onBrandSecondary": "#4A3A00",
+    "brandTertiary": "#FF5277",
+    "onBrandTertiary": "#FFFFFF",
+    "success": "#04B077",
+    "onSuccess": "#FFFFFF",
+    "warning": "#FFC800",
+    "onWarning": "#4A3A00",
+    "error": "#FF3B30",
+    "onError": "#FFFFFF",
+    "info": "#131614",
+    "onInfo": "#FFFFFF",
+    "border": "#E8E8E3",
+    "borderStrong": "#D1D1CA",
+    "divider": "#F0F0EB",
+    "muted": "#7A807D"
+  },
+  "typography": {
+    "displayFontFamily": "Fredoka",
+    "textFontFamily": "Nunito",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Handle spacing correctly dont have extra spaces where its not required, handle padding and margin corectly and subtle for buttons and components. Use chunky spacing to maintain the tactile feel.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "pill": 999
+  },
+  "shadow_tier": "2",
+  "navigation": "bottom_tabs",
+  "icon_set": "Feather",
+  "glassmorphism": {
+    "enabled": "true",
+    "do's": [
+      "refer to <Glassmorphism_and_Blur>",
+      "Use on bottom tab bar",
+      "Use on sticky headers or streak widgets over scrollable content"
+    ],
+    "dont's": [
+      "refer to <Glassmorphism_and_Blur>",
+      "Do not use on regular list rows or standard buttons"
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Home",
+      "purpose": "A motivational dashboard focused on the daily streak, current learning progress, and discovering new skills.",
+      "states": {
+        "loading": "Centered spinner using brandPrimary color.",
+        "empty": "Playful illustration of a notebook with a CTA to start the first coding lesson.",
+        "error": "Oops message with a friendly 'Try again' CTA."
+      },
+      "layout": "Sticky header with profile avatar and flame streak widget. Single column for 'Continue Learning' large hero card (width: 100% minus padding). Followed by 'Trending Skills' using a 2-column wrapping flex layout (`flexDirection: 'row'`, `flexWrap: 'wrap'`, `justifyContent: 'space-between'`, `gap: md`)."
+    },
+    {
+      "name": "Learn",
+      "purpose": "Course catalog where users browse categories and view course details/progress.",
+      "states": {
+        "loading": "Skeleton loaders for course cards.",
+        "empty": "No courses found illustration + 'Clear Filters' CTA.",
+        "error": "Error loading catalog + Retry button."
+      },
+      "layout": "Sticky horizontal scrollable pill filter row at the top (glass background). Below, a vertical stack of full-width course cards (`surfaceSecondary` with `shadow 2`). Each card includes a circular progress indicator or progress bar."
+    },
+    {
+      "name": "Challenges",
+      "purpose": "Gamified arena for daily coding challenges, difficulty selection, and leaderboards.",
+      "states": {
+        "loading": "Spinner in the center.",
+        "empty": "No active challenges today illustration.",
+        "error": "Failed to load leaderboard + Retry."
+      },
+      "layout": "Top section: Large Daily Challenge hero card with a bright gradient or tinted background. Middle section: Difficulty selector (segmented controls). Bottom section: Leaderboard as a vertical list with `surfaceSecondary` rows. Top 3 ranks should have subtle brandSecondary/brandTertiary accents."
+    },
+    {
+      "name": "Profile",
+      "purpose": "Showcase user achievements, learning stats, and badges.",
+      "states": {
+        "loading": "Spinner.",
+        "empty": "N/A - Profile always has base stats.",
+        "error": "Failed to load profile + Retry."
+      },
+      "layout": "Header: Large avatar with username. Below: A 2x2 grid of stat cards (Streak, XP, Courses, Rank) using `flexWrap: 'wrap'`. Below that: 'Badges' section in a 3-column grid (`justifyContent: 'flex-start'`, `gap: md`)."
+    }
+  ],
+  "images": {
+    "hero_coding": {
+      "url": "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1Mjh8MHwxfHNlYXJjaHwxfHxwZXJzb24lMjBjb2RpbmclMjBvbiUyMGxhcHRvcCUyMGJyaWdodGx5JTIwbGl0fGVufDB8fHx8MTc5MDYyNDE4N3ww&ixlib=rb-4.1.0&q=85",
+      "alt": "person coding on laptop"
+    },
+    "python_logo": {
+      "url": "https://images.unsplash.com/photo-1649180556628-9ba704115795?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwxfHxweXRob24lMjBwcm9ncmFtbWluZyUyMGxhbmd1YWdlJTIwbG9nb3xlbnwwfHx8fDE3OTA2MjQyMDB8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "python logo 3d"
+    },
+    "javascript_logo": {
+      "url": "https://images.unsplash.com/photo-1635220035700-f2d881d763c2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxqYXZhc2NyaXB0JTIwbG9nbyUyMHBuZ3xlbnwwfHx8fDE3OTA2MjQxODd8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "javascript logo"
+    },
+    "avatar_user": {
+      "url": "https://images.unsplash.com/photo-1686149130428-6609121863b7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwxfHxzbWlsaW5nJTIwcGVyc29uJTIwcG9ydHJhaXQlMjBjb2xvcmZ1bCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzkwNjI0MTg3fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "smiling user portrait"
+    },
+    "empty_state": {
+      "url": "https://images.unsplash.com/photo-1760009229725-7ef1990e585f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTJ8MHwxfHNlYXJjaHwxfHxwbGF5ZnVsJTIwM2QlMjBpbGx1c3RyYXRpb24lMjBub3RlYm9va3xlbnwwfHx8fDE3OTA2MjQyMDB8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "playful 3d illustration notebook for empty state"
+    }
+  },
+  "haptics": {
+    "primary_button_press": "impactLight",
+    "tab_change": "selection",
+    "streak_increment": "notificationSuccess",
+    "course_card_tap": "impactLight"
+  },
+  "instructions_to_main_agent": [
+    "Follow the '4 Tactile / Playful' personality strictly. Ensure cards are chunky, have generous `md/lg` paddings, and utilize `sm` or `md` radii for a friendly look.",
+    "BANNED COLORS STRICTLY ENFORCED: Do NOT use any blues (no navy, sky blue, indigo) or purples anywhere in the app. Use the defined Mint Green (#04B077), Sunny Yellow (#FFC800), and Coral Pink (#FF5277).",
+    "Gamification UX: Give the daily streak high prominence (e.g., in a sticky header with a flame icon). Highlight leaderboard top ranks and completed progress rings with the brandSecondary color (Yellow) to celebrate achievement.",
+    "Use 'Fredoka' for all headings and 'Nunito' for body text. Do not exceed font weight 500.",
+    "Implement glassmorphism on the bottom tabs and any sticky headers (like the streak/avatar header) overriding scrolling content.",
+    "When placing text over the 'hero_coding' image card, always use a vertical gradient scrim (transparent to surfaceInverse at >=70% opacity) behind the text to guarantee contrast."
+  ]
+}
