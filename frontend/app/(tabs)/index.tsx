@@ -216,44 +216,153 @@ export default function HomeScreen() {
               <Text style={styles.sectionAction}>See all</Text>
             </Pressable>
           </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              gap: spacing.md,
-              paddingHorizontal: spacing.lg,
-            }}
-          >
-            {learningPaths.map((p) => (
-              <Pressable
-                key={p.id}
-                style={[styles.pathCard, { backgroundColor: p.color }]}
-                testID={`path-${p.id}`}
-              >
-                <Text style={styles.pathEmoji}>{p.emoji}</Text>
-                <Text
-                  style={[
-                    styles.pathTitle,
-                    p.color === "#FFC800"
-                      ? { color: colors.onBrandSecondary }
-                      : { color: colors.onBrandPrimary },
-                  ]}
+          <View style={styles.pathList}>
+            {learningPaths.map((p) => {
+              const progress = p.completed / p.courses;
+              return (
+                <Pressable
+                  key={p.id}
+                  style={styles.pathCard}
+                  testID={`path-${p.id}`}
                 >
-                  {p.title}
-                </Text>
-                <Text
-                  style={[
-                    styles.pathMeta,
-                    p.color === "#FFC800"
-                      ? { color: colors.onBrandSecondary }
-                      : { color: "rgba(255,255,255,0.85)" },
-                  ]}
-                >
-                  {p.courses} courses · {p.hours}h
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
+                  <LinearGradient
+                    colors={p.gradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.pathGradient}
+                  >
+                    <View style={styles.pathTopRow}>
+                      <View style={styles.pathKickerPill}>
+                        <Text
+                          style={[
+                            styles.pathKicker,
+                            p.color === "#FFC800"
+                              ? { color: colors.onBrandSecondary }
+                              : { color: "#FFFFFF" },
+                          ]}
+                        >
+                          PATH · {p.courses} concepts · {p.hours}h
+                        </Text>
+                      </View>
+                      <View style={styles.pathEmojiMedallion}>
+                        <Text style={styles.pathEmoji}>{p.emoji}</Text>
+                      </View>
+                    </View>
+
+                    <Text
+                      style={[
+                        styles.pathTitleBig,
+                        p.color === "#FFC800"
+                          ? { color: colors.onBrandSecondary }
+                          : { color: "#FFFFFF" },
+                      ]}
+                    >
+                      {p.title}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.pathTagline,
+                        p.color === "#FFC800"
+                          ? { color: "rgba(74,58,0,0.8)" }
+                          : { color: "rgba(255,255,255,0.9)" },
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {p.tagline}
+                    </Text>
+
+                    {/* concept preview icons */}
+                    <View style={styles.pathConceptStack}>
+                      {p.conceptEmojis.slice(0, 4).map((e, i) => (
+                        <View
+                          key={i}
+                          style={[
+                            styles.pathConceptDot,
+                            {
+                              marginLeft: i === 0 ? 0 : -10,
+                              zIndex: 5 - i,
+                              backgroundColor: "#FFFFFF",
+                            },
+                          ]}
+                        >
+                          <Text style={{ fontSize: 15 }}>{e}</Text>
+                        </View>
+                      ))}
+                      <Text
+                        style={[
+                          styles.pathConceptMore,
+                          p.color === "#FFC800"
+                            ? { color: colors.onBrandSecondary }
+                            : { color: "#FFFFFF" },
+                        ]}
+                      >
+                        +{p.courses - p.conceptEmojis.length} more
+                      </Text>
+                    </View>
+
+                    {/* progress footer */}
+                    <View style={styles.pathFooter}>
+                      <View style={{ flex: 1 }}>
+                        <View
+                          style={[
+                            styles.pathProgressTrack,
+                            {
+                              backgroundColor:
+                                p.color === "#FFC800"
+                                  ? "rgba(74,58,0,0.2)"
+                                  : "rgba(255,255,255,0.28)",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[
+                              styles.pathProgressFill,
+                              {
+                                width: `${Math.max(progress * 100, 4)}%`,
+                                backgroundColor:
+                                  p.color === "#FFC800"
+                                    ? colors.onBrandSecondary
+                                    : "#FFFFFF",
+                              },
+                            ]}
+                          />
+                        </View>
+                        <Text
+                          style={[
+                            styles.pathProgressText,
+                            p.color === "#FFC800"
+                              ? { color: colors.onBrandSecondary }
+                              : { color: "rgba(255,255,255,0.95)" },
+                          ]}
+                        >
+                          {p.completed} of {p.courses} concepts mastered
+                        </Text>
+                      </View>
+                      <View
+                        style={[
+                          styles.pathCta,
+                          {
+                            backgroundColor:
+                              p.color === "#FFC800"
+                                ? colors.onBrandSecondary
+                                : "#FFFFFF",
+                          },
+                        ]}
+                      >
+                        <Feather
+                          name={p.completed > 0 ? "play" : "arrow-right"}
+                          size={16}
+                          color={
+                            p.color === "#FFC800" ? "#FFC800" : p.color
+                          }
+                        />
+                      </View>
+                    </View>
+                  </LinearGradient>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
 
         {/* Trending Concepts */}
@@ -501,17 +610,148 @@ const styles = StyleSheet.create({
     color: colors.onBrandSecondary,
   },
 
-  // Paths
-  pathCard: {
-    width: 180,
-    height: 140,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    justifyContent: "space-between",
+  // Paths — journey cards
+  pathList: {
+    paddingHorizontal: spacing.lg,
+    gap: spacing.md,
   },
-  pathEmoji: { fontSize: 32 },
-  pathTitle: { fontSize: 17, fontWeight: "700", marginTop: spacing.sm },
-  pathMeta: { fontSize: 12, fontWeight: "500", marginTop: 4 },
+  pathCard: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.12,
+        shadowRadius: 14,
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  pathGradient: {
+    padding: spacing.lg,
+    overflow: "hidden",
+  },
+  pathRingA: {
+    position: "absolute",
+    right: -60,
+    top: -60,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    borderWidth: 40,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+  pathRingB: {
+    position: "absolute",
+    right: -100,
+    bottom: -100,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    borderWidth: 30,
+    borderColor: "rgba(255,255,255,0.06)",
+  },
+  pathTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: spacing.md,
+  },
+  pathKickerPill: {
+    backgroundColor: "rgba(255,255,255,0.22)",
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+  },
+  pathKicker: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 0.6,
+  },
+  pathEmojiMedallion: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.md,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    alignItems: "center",
+    justifyContent: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+      },
+      android: { elevation: 3 },
+    }),
+  },
+  pathEmoji: { fontSize: 30 },
+  pathTitleBig: {
+    fontSize: 22,
+    fontWeight: "700",
+    letterSpacing: -0.4,
+    marginBottom: 4,
+  },
+  pathTagline: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: spacing.md,
+  },
+  pathConceptStack: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: spacing.md,
+  },
+  pathConceptDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.9)",
+  },
+  pathConceptMore: {
+    marginLeft: spacing.sm,
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  pathFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  pathProgressTrack: {
+    height: 6,
+    borderRadius: 3,
+    overflow: "hidden",
+    marginBottom: 6,
+  },
+  pathProgressFill: {
+    height: 6,
+    borderRadius: 3,
+  },
+  pathProgressText: {
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  pathCta: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+      },
+      android: { elevation: 2 },
+    }),
+  },
 
   // Skills grid
   grid: {
