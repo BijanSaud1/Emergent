@@ -18,6 +18,8 @@ import { usesNativeTabs } from "@/src/navigation";
 import { StreakHeader } from "@/src/components/streak-header";
 import { ProgressBar } from "@/src/components/progress-bar";
 import { StreakFreezeModal } from "@/src/components/streak-freeze-modal";
+import { ConceptIcon, iconFromEmoji } from "@/src/components/concept-icon";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import {
   user,
   continueLearning,
@@ -134,7 +136,11 @@ export default function HomeScreen() {
                   { backgroundColor: factOfTheDay.color },
                 ]}
               >
-                <Text style={styles.factEmoji}>{factOfTheDay.emoji}</Text>
+                <MaterialDesignIcons
+                  name={iconFromEmoji(factOfTheDay.emoji) as any}
+                  size={26}
+                  color={colors.onBrandSecondary}
+                />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.factTopic}>{factOfTheDay.topic}</Text>
@@ -245,7 +251,11 @@ export default function HomeScreen() {
                         </Text>
                       </View>
                       <View style={styles.pathEmojiMedallion}>
-                        <Text style={styles.pathEmoji}>{p.emoji}</Text>
+                        <MaterialDesignIcons
+                          name={iconFromEmoji(p.emoji) as any}
+                          size={30}
+                          color={p.color}
+                        />
                       </View>
                     </View>
 
@@ -285,7 +295,11 @@ export default function HomeScreen() {
                             },
                           ]}
                         >
-                          <Text style={{ fontSize: 15 }}>{e}</Text>
+                          <MaterialDesignIcons
+                            name={iconFromEmoji(e) as any}
+                            size={16}
+                            color={p.color}
+                          />
                         </View>
                       ))}
                       <Text
@@ -422,7 +436,11 @@ export default function HomeScreen() {
                   <View
                     style={[styles.trendEmojiBox, { backgroundColor: c.color }]}
                   >
-                    <Text style={styles.trendEmoji}>{c.emoji}</Text>
+                    <MaterialDesignIcons
+                      name={iconFromEmoji(c.emoji) as any}
+                      size={28}
+                      color="#FFFFFF"
+                    />
                   </View>
 
                   {/* content bottom */}

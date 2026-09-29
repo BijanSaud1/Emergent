@@ -12,6 +12,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
+import { iconFromEmoji } from "@/src/components/concept-icon";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { courses, conceptContent, Lesson } from "@/src/data/mock";
 
 const fallbackLessons: Lesson[] = [
@@ -70,7 +72,13 @@ export default function LearnFlow() {
             { paddingTop: insets.top + spacing.xl },
           ]}
         >
-          <Text style={styles.doneEmoji}>🎉</Text>
+          <View style={styles.doneIconBig}>
+            <MaterialDesignIcons
+              name="party-popper"
+              size={56}
+              color={colors.brandPrimary}
+            />
+          </View>
           <Text style={styles.doneTitle}>Nice work!</Text>
           <Text style={styles.doneSubtitle}>
             You finished{" "}
@@ -154,7 +162,11 @@ export default function LearnFlow() {
         showsVerticalScrollIndicator={false}
       >
         <View style={[styles.lessonEmojiBox, { backgroundColor: concept.color + "1A" }]}>
-          <Text style={styles.lessonEmoji}>{lesson.emoji}</Text>
+          <MaterialDesignIcons
+            name={iconFromEmoji(lesson.emoji) as any}
+            size={44}
+            color={concept.color}
+          />
         </View>
         <Text style={styles.lessonKicker}>
           Lesson {step + 1} · {concept.title}
@@ -352,7 +364,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: spacing.md,
   },
-  doneEmoji: { fontSize: 72, marginBottom: spacing.md },
+  doneIconBig: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: colors.brandPrimary + "18",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.md,
+  },
   doneTitle: {
     fontSize: 28,
     fontWeight: "700",

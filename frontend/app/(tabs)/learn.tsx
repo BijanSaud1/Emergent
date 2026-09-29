@@ -18,16 +18,18 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, radius, spacing } from "@/src/theme";
 import { usesNativeTabs } from "@/src/navigation";
 import { ProgressBar } from "@/src/components/progress-bar";
+import { iconFromEmoji } from "@/src/components/concept-icon";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { categories, courses, Course } from "@/src/data/mock";
 
-const chipEmojis: Record<string, string> = {
-  All: "✨",
-  Trending: "🔥",
-  Biology: "🌿",
-  Physics: "⚛️",
-  Psychology: "🧠",
-  Philosophy: "🚋",
-  History: "🏛️",
+const chipIcons: Record<string, string> = {
+  All: "star-four-points",
+  Trending: "fire",
+  Biology: "leaf",
+  Physics: "atom",
+  Psychology: "brain",
+  Philosophy: "scale-balance",
+  History: "bank",
 };
 
 export default function LearnScreen() {
@@ -109,7 +111,11 @@ export default function LearnScreen() {
                 ]}
                 testID={`chip-${c}`}
               >
-                <Text style={styles.chipEmoji}>{chipEmojis[c] ?? "📚"}</Text>
+                <MaterialDesignIcons
+                  name={(chipIcons[c] ?? "book-open-variant") as any}
+                  size={14}
+                  color={selected ? colors.onBrandPrimary : colors.onSurface}
+                />
                 <Text
                   style={[
                     styles.chipText,
@@ -165,7 +171,11 @@ export default function LearnScreen() {
                         { backgroundColor: c.color + "22" },
                       ]}
                     >
-                      <Text style={{ fontSize: 20 }}>{c.emoji}</Text>
+                      <MaterialDesignIcons
+                        name={iconFromEmoji(c.emoji) as any}
+                        size={20}
+                        color={c.color}
+                      />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.progressChipTitle} numberOfLines={1}>
@@ -204,7 +214,11 @@ export default function LearnScreen() {
         renderItem={({ item }) => <CourseCard course={item} />}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyEmoji}>🔍</Text>
+            <MaterialDesignIcons
+              name="magnify"
+              size={48}
+              color={colors.muted}
+            />
             <Text style={styles.emptyTitle}>No concepts found</Text>
             <Text style={styles.emptyText}>
               Try another subject or clear your search.
@@ -232,10 +246,16 @@ function CourseCard({ course }: { course: Course }) {
           transition={150}
         />
         <LinearGradient
-          colors={["rgba(19,22,20,0.05)", "rgba(19,22,20,0.55)"]}
+          colors={["rgba(19,22,20,0.1)", "rgba(19,22,20,0.65)"]}
           style={StyleSheet.absoluteFill}
         />
-        <Text style={styles.cardEmoji}>{course.emoji}</Text>
+        <View style={styles.cardIconWrap}>
+          <MaterialDesignIcons
+            name={iconFromEmoji(course.emoji) as any}
+            size={30}
+            color="#FFFFFF"
+          />
+        </View>
       </View>
       <View style={styles.cardBody}>
         <View style={styles.cardTopRow}>
@@ -493,11 +513,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     padding: spacing.sm,
   },
-  cardEmoji: {
-    fontSize: 40,
-    textShadowColor: "rgba(0,0,0,0.25)",
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+  cardIconWrap: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.55)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardBody: {
     flex: 1,

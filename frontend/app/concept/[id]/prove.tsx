@@ -12,6 +12,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { courses, conceptContent, QuizQuestion } from "@/src/data/mock";
 
 const fallbackQuiz: QuizQuestion[] = [
@@ -85,7 +86,22 @@ export default function ProveFlow() {
     return (
       <View style={styles.container} testID="prove-complete">
         <View style={[styles.doneWrap, { paddingTop: insets.top + spacing.xl }]}>
-          <Text style={styles.doneEmoji}>{passed ? "🏆" : "💪"}</Text>
+          <View
+            style={[
+              styles.doneIconBig,
+              {
+                backgroundColor: passed
+                  ? colors.brandSecondary + "22"
+                  : colors.brandTertiary + "22",
+              },
+            ]}
+          >
+            <MaterialDesignIcons
+              name={passed ? "trophy" : "arm-flex"}
+              size={56}
+              color={passed ? colors.brandSecondary : colors.brandTertiary}
+            />
+          </View>
           <Text style={styles.doneTitle}>
             {passed ? "You proved it!" : "Almost there"}
           </Text>
@@ -425,7 +441,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  doneEmoji: { fontSize: 72, marginBottom: spacing.md },
+  doneIconBig: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.md,
+  },
   doneTitle: {
     fontSize: 28,
     fontWeight: "700",

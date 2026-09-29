@@ -15,6 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
 import { ProgressBar } from "@/src/components/progress-bar";
+import { iconFromEmoji } from "@/src/components/concept-icon";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { courses, conceptContent } from "@/src/data/mock";
 
 export default function ConceptDetail() {
@@ -82,7 +84,13 @@ export default function ConceptDetail() {
                 <Text style={styles.levelPillText}>{concept.level}</Text>
               </View>
             </View>
-            <Text style={styles.heroEmoji}>{concept.emoji}</Text>
+            <View style={styles.heroEmoji}>
+              <MaterialDesignIcons
+                name={iconFromEmoji(concept.emoji) as any}
+                size={40}
+                color="#FFFFFF"
+              />
+            </View>
             <Text style={styles.heroTitle}>{concept.title}</Text>
             <Text style={styles.heroSubtitle}>{concept.subtitle}</Text>
           </View>
@@ -279,7 +287,17 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.onBrandSecondary,
   },
-  heroEmoji: { fontSize: 40, marginBottom: 4 },
+  heroEmoji: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.55)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.sm,
+  },
   heroTitle: {
     fontSize: 30,
     fontWeight: "700",

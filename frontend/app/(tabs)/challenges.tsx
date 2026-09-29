@@ -10,6 +10,7 @@ import {
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@react-native-vector-icons/feather";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
@@ -216,9 +217,17 @@ export default function ChallengesScreen() {
                     </Text>
                   </View>
                   {isTop3 && (
-                    <Text style={styles.medalEmoji}>
-                      {e.rank === 1 ? "🥇" : e.rank === 2 ? "🥈" : "🥉"}
-                    </Text>
+                    <MaterialDesignIcons
+                      name={e.rank === 1 ? "medal" : "medal-outline"}
+                      size={20}
+                      color={
+                        e.rank === 1
+                          ? colors.brandSecondary
+                          : e.rank === 2
+                          ? colors.borderStrong
+                          : colors.brandTertiary
+                      }
+                    />
                   )}
                 </View>
               );

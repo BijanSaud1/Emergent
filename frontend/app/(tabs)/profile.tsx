@@ -15,6 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, radius, spacing } from "@/src/theme";
 import { usesNativeTabs } from "@/src/navigation";
+import { iconFromEmoji } from "@/src/components/concept-icon";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import {
   user,
   badges,
@@ -139,28 +141,32 @@ export default function ProfileScreen() {
         {/* Compact stat strip */}
         <View style={styles.statStrip} testID="stats-strip">
           <StatMini
-            emoji="🔥"
+            icon="fire"
+            iconColor={colors.brandTertiary}
             value={String(user.streak)}
             label="Streak"
+            tint={colors.brandTertiary + "18"}
+          />
+          <View style={styles.statDivider} />
+          <StatMini
+            icon="star-four-points"
+            iconColor={colors.brandSecondary}
+            value={user.xp.toLocaleString()}
+            label="Total XP"
             tint={colors.brandSecondary + "22"}
           />
           <View style={styles.statDivider} />
           <StatMini
-            emoji="⭐"
-            value={user.xp.toLocaleString()}
-            label="Total XP"
-            tint={colors.brandPrimary + "22"}
-          />
-          <View style={styles.statDivider} />
-          <StatMini
-            emoji="📚"
+            icon="book-open-variant"
+            iconColor={colors.brandPrimary}
             value={String(user.coursesCompleted)}
             label="Learned"
-            tint={colors.brandTertiary + "22"}
+            tint={colors.brandPrimary + "18"}
           />
           <View style={styles.statDivider} />
           <StatMini
-            emoji="🏅"
+            icon="medal"
+            iconColor={colors.onSurface}
             value={`#${user.rank}`}
             label="Rank"
             tint={colors.surfaceTertiary}
@@ -247,7 +253,11 @@ export default function ProfileScreen() {
                 ]}
                 testID={`subject-${s.id}`}
               >
-                <Text style={styles.subjectEmoji}>{s.emoji}</Text>
+                <MaterialDesignIcons
+                  name={iconFromEmoji(s.emoji) as any}
+                  size={16}
+                  color={s.color}
+                />
                 <Text style={styles.subjectLabel}>{s.label}</Text>
               </View>
             ))}
@@ -274,7 +284,11 @@ export default function ProfileScreen() {
                     { backgroundColor: m.color + "22" },
                   ]}
                 >
-                  <Text style={styles.masteredEmojiText}>{m.emoji}</Text>
+                  <MaterialDesignIcons
+                    name={iconFromEmoji(m.emoji) as any}
+                    size={22}
+                    color={m.color}
+                  />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.masteredTitle}>{m.title}</Text>
@@ -344,7 +358,11 @@ export default function ProfileScreen() {
                   </View>
 
                   <View style={styles.latestEmojiWrap}>
-                    <Text style={styles.latestEmoji}>{latest.emoji}</Text>
+                    <MaterialDesignIcons
+                      name={iconFromEmoji(latest.emoji) as any}
+                      size={48}
+                      color="#FFFFFF"
+                    />
                   </View>
                 </LinearGradient>
               </View>
@@ -374,7 +392,11 @@ export default function ProfileScreen() {
                     <View
                       style={[styles.trophyInner, { backgroundColor: b.color }]}
                     >
-                      <Text style={styles.trophyEmoji}>{b.emoji}</Text>
+                      <MaterialDesignIcons
+                        name={iconFromEmoji(b.emoji) as any}
+                        size={26}
+                        color="#FFFFFF"
+                      />
                     </View>
                   </View>
                   <Text style={styles.trophyName} numberOfLines={1}>
@@ -411,7 +433,11 @@ export default function ProfileScreen() {
                       { backgroundColor: colors.surfaceTertiary },
                     ]}
                   >
-                    <Text style={styles.progressEmoji}>{b.emoji}</Text>
+                    <MaterialDesignIcons
+                      name={iconFromEmoji(b.emoji) as any}
+                      size={26}
+                      color={colors.muted}
+                    />
                     <View style={styles.lockPill}>
                       <Feather name="lock" size={10} color={colors.muted} />
                     </View>
@@ -520,12 +546,14 @@ function tierColor(tier: "Common" | "Rare" | "Epic" | "Legendary") {
 }
 
 function StatMini({
-  emoji,
+  icon,
+  iconColor,
   value,
   label,
   tint,
 }: {
-  emoji: string;
+  icon: string;
+  iconColor: string;
   value: string;
   label: string;
   tint: string;
@@ -533,7 +561,7 @@ function StatMini({
   return (
     <View style={styles.statMini}>
       <View style={[styles.statMiniIcon, { backgroundColor: tint }]}>
-        <Text style={{ fontSize: 16 }}>{emoji}</Text>
+        <MaterialDesignIcons name={icon as any} size={17} color={iconColor} />
       </View>
       <Text style={styles.statMiniValue}>{value}</Text>
       <Text style={styles.statMiniLabel}>{label}</Text>

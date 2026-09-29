@@ -8,6 +8,7 @@ import {
   Platform,
 } from "react-native";
 import Feather from "@react-native-vector-icons/feather";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, radius, spacing } from "@/src/theme";
 
@@ -59,7 +60,13 @@ export function StreakFreezeModal({ visible, streak, onClose }: Props) {
             >
               <Feather name="x" size={18} color={colors.onSurface} />
             </Pressable>
-            <Text style={styles.flame}>🧊🔥</Text>
+            <View style={styles.flameWrap}>
+              <MaterialDesignIcons
+                name="snowflake"
+                size={40}
+                color="#FFFFFF"
+              />
+            </View>
             <Text style={styles.heroTitle}>Protect your {streak}-day streak</Text>
             <Text style={styles.heroSubtitle}>
               Streak Freeze auto-saves your progress on days you can't practice
@@ -158,7 +165,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  flame: { fontSize: 48, marginBottom: spacing.sm, marginTop: spacing.md },
+  flameWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(255,255,255,0.28)",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.55)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.md,
+    marginTop: spacing.md,
+  },
   heroTitle: {
     fontSize: 22,
     fontWeight: "700",
